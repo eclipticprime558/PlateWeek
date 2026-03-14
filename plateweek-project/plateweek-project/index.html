@@ -639,22 +639,21 @@ body.pwa-mode #app{padding-bottom:calc(62px + env(safe-area-inset-bottom))}
 </div>
 
 <!-- Voice FAB -->
-<div id="voice-fab" onclick="Voice.togglePanel()" title="Say 'Plate Week, add [item]'">🎙</div>
+<div id="voice-fab" onclick="Voice.togglePanel()" title="Tap to use voice commands">🎙</div>
 <div id="voice-panel">
-  <div class="vp-status" id="vp-status">Tap button below to speak</div>
+  <div class="vp-status" id="vp-status">Tap the button to speak</div>
   <div class="vp-heard" id="vp-heard">—</div>
   <div class="vp-waves" id="vp-waves" style="display:none">
     <div class="vp-bar"></div><div class="vp-bar"></div><div class="vp-bar"></div>
     <div class="vp-bar"></div><div class="vp-bar"></div>
   </div>
-  <div class="vp-hint" id="vp-hint">After tapping, say any command:<br>
+  <div class="vp-hint" id="vp-hint">Tap, then say a command:<br>
     <span class="vp-voice-cmd">"add eggs"</span>
     <span class="vp-voice-cmd">"add chicken"</span><br>
     <span class="vp-voice-cmd">"I ate a Big Mac"</span>
     <span class="vp-voice-cmd">"I had scrambled eggs"</span>
-    <br><span style="color:var(--t3);font-size:10px">Or say <strong style="color:var(--amber)">"Plate Week"</strong> as wake phrase anytime</span>
   </div>
-  <button class="vp-tap-btn" onclick="Voice.activateNow()">🎙 Tap to Speak</button>
+  <button class="vp-tap-btn" onclick="Voice.startListening()">🎙 Tap to Speak</button>
   <div class="vp-shortcut-hint" style="margin-top:8px">
     <span>Last action:</span>
     <span id="vp-last" style="color:var(--text);font-size:11px">—</span>
@@ -1763,29 +1762,36 @@ const Voice={
   init(){
     const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
     if(!SR){
-      document.getElementById('voice-fab').title='Voice not supported in this browser. Use Chrome.';
+      document.getElementById('voice-fab').title='Voice not supported in this browser. Use Chrome or Safari.';
       document.getElementById('voice-fab').style.opacity='.4';
-      return;
+      return false;
     }
     this.recognition=new SR();
-    this.recognition.continuous=true;
+    this.recognition.continuous=false;
     this.recognition.interimResults=true;
     this.recognition.lang='en-US';
     this.recognition.onresult=e=>this.onResult(e);
     this.recognition.onerror=e=>{
-      if(e.error!=='no-speech'&&e.error!=='aborted') this.setState('idle');
-    };
-    this.recognition.onend=()=>{
-      // Auto-restart to keep listening
-      if(this.state!=='off'){
-        try{this.recognition.start();}catch(err){}
+      if(e.error==='no-speech'){
+        this.setState('ready');
+        document.getElementById('vp-heard').textContent="Didn't catch that — try again";
+      } else if(e.error!=='aborted'){
+        this.setState('ready');
       }
     };
-    this.setState('idle');
-    this.start();
+    this.recognition.onend=()=>{
+      // Only return to ready if we didn't already move to processing
+      if(this.state==='activated') this.setState('ready');
+    };
+    return true;
   },
 
-  start(){
+  startListening(){
+    if(!this.recognition){
+      if(!this.init()) return;
+    }
+    this.setState('activated');
+    document.getElementById('vp-heard').textContent='Listening…';
     try{this.recognition.start();}catch(err){}
   },
 
@@ -1796,21 +1802,23 @@ const Voice={
     const status=document.getElementById('vp-status');
     fab.className='';
     waves.style.display='none';
-    if(s==='idle'){
-      fab.classList.add('listening');
-      status.textContent='Listening for "Plate Week"…';
+    clearTimeout(this.wakeTimeout);
+    if(s==='ready'){
+      status.textContent='Tap the button to speak';
     } else if(s==='activated'){
-      fab.classList.add('activated');
-      status.textContent='🟢 Listening — say your command';
+      fab.classList.add('listening');
+      status.textContent='🎙 Listening…';
       waves.style.display='flex';
-      // Auto timeout after 8s
-      clearTimeout(this.wakeTimeout);
-      this.wakeTimeout=setTimeout(()=>this.setState('idle'),8000);
+      // Safety timeout — stop if no speech after 10s
+      this.wakeTimeout=setTimeout(()=>{
+        try{this.recognition.stop();}catch(e){}
+        this.setState('ready');
+      },10000);
     } else if(s==='processing'){
       fab.classList.add('processing');
-      status.textContent='Processing…';
+      status.textContent='Got it — processing…';
     } else {
-      status.textContent='Voice off';
+      status.textContent='Tap the button to speak';
     }
   },
 
@@ -1826,21 +1834,7 @@ const Voice={
 
     document.getElementById('vp-heard').textContent=heard;
 
-    // Wake phrase detection
-    const wakePatterns=[
-      'plate week','plateweek','play week','plate weak','hey plate','okay plate',
-      'ok plate','plate,','plate.','plate!','hey plate week','okay plate week'
-    ];
-    const isWake=wakePatterns.some(p=>heard.includes(p));
-
-    if(isWake && this.state==='idle'){
-      this.setState('activated');
-      this.speak('Yes?');
-      document.getElementById('vp-heard').textContent='🟢 Listening…';
-      return;
-    }
-
-    // Command parsing (only when activated)
+    // Parse command on final result
     if(this.state==='activated' && final){
       this.parseCommand(final.trim().toLowerCase());
     }
@@ -1872,7 +1866,7 @@ const Voice={
         this.speak(`Logged ${ateItem}`);
       }
       document.getElementById('vp-last').textContent=ateItem;
-      this.setState('idle');
+      this.setState('ready');
       return;
     }
 
@@ -1895,7 +1889,7 @@ const Voice={
       this.lastAdded=item;
       document.getElementById('vp-last').textContent=item;
       this.speak(`Added ${item}`);
-      setTimeout(()=>this.setState('activated'),1200);
+      setTimeout(()=>this.setState('ready'),1200);
     } else {
       const txt=text.trim();
       if(txt.length>2){document.getElementById('vp-heard').textContent=`❓ "${txt}"`;}
@@ -1914,32 +1908,23 @@ const Voice={
     this.panelOpen=!this.panelOpen;
     const panel=document.getElementById('voice-panel');
     panel.classList.toggle('show',this.panelOpen);
-    if(this.panelOpen){
-      if(this.state==='off') this.init();
-      // Immediately go to activated (ready for commands) when user taps the button
-      setTimeout(()=>{
-        if(this.state==='idle'){
-          this.setState('activated');
-          this.speak('Ready');
-        }
-      },300);
+    if(this.panelOpen && this.state==='off'){
+      this.setState('ready');
     }
   },
 
   activateNow(){
-    if(this.state==='off'){this.init();setTimeout(()=>this.setState('activated'),500);}
-    else{this.setState('activated');this.speak('Ready');}
     this.panelOpen=true;
     document.getElementById('voice-panel').classList.add('show');
+    this.startListening();
   },
 
   toggleMic(){
-    if(this.state==='off'){
-      this.init();
-    } else {
-      this.state='off';
+    if(this.state==='activated'){
       try{this.recognition.stop();}catch(e){}
-      this.setState('off');
+      this.setState('ready');
+    } else {
+      this.startListening();
     }
   }
 };
@@ -2294,7 +2279,7 @@ function renderGroceryView(){
         <div class="gv-sc">
           <div class="gv-sc-title">🎙 Voice Commands</div>
           <div style="font-size:11px;color:var(--t3);margin-bottom:10px;line-height:1.6">
-            Say <strong style="color:var(--amber)">"Plate Week"</strong> to wake:<br>
+            Tap the mic button, then say a command:<br>
           </div>
           ${['add eggs','add chicken breast','add oat milk','add frozen berries','add sourdough'].map(cmd=>`<div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:6px 10px;margin-bottom:5px;font-size:11px;color:var(--green)">🎙 "${cmd}"</div>`).join('')}
           <button class="btn" onclick="Voice.togglePanel()" style="width:100%;margin-top:8px;font-size:11px;border-color:var(--gdim);color:var(--green)">Open Voice Panel</button>
@@ -3557,7 +3542,7 @@ function seed(){
 // ═══════════════════════════════════════════════
 seed();
 NotifMgr.init();
-Voice.init(); // Start listening immediately
+// Voice is push-to-talk — mic starts only when user taps the button
 render();
 setInterval(()=>renderMealTimeInd(),60000);
 
