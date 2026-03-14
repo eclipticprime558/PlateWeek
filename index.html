@@ -404,6 +404,51 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .vp-countdown{font-size:10px;color:var(--t3);text-align:center;margin-top:5px}
 @media(max-width:960px){.mg-grid{grid-template-columns:repeat(4,1fr)}.ex-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:600px){.mg-grid{grid-template-columns:repeat(3,1fr)}.ex-grid{grid-template-columns:1fr}}
+
+/* ─── FITNESS GENDER PICKER ─── */
+.fit-gender-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:24px 0}
+.fit-gender-card{background:var(--card);border:2px solid var(--border);border-radius:20px;padding:36px 24px;text-align:center;cursor:pointer;transition:all .2s;overflow:hidden}
+.fit-gender-card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,.4)}
+.fit-gender-emoji{font-size:64px;margin-bottom:16px;display:block;line-height:1}
+.fit-gender-title{font-family:'Playfair Display',serif;font-size:24px;margin-bottom:8px}
+.fit-gender-sub{font-size:12px;color:var(--t2);line-height:1.6}
+
+/* ─── GOAL CARDS ─── */
+.fit-goal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:20px}
+.fit-goal-card{border-radius:16px;padding:24px 18px;cursor:pointer;transition:all .2s;border:2px solid transparent}
+.fit-goal-card:hover{transform:translateY(-3px);box-shadow:0 10px 32px rgba(0,0,0,.4)}
+.fit-goal-emoji{font-size:36px;margin-bottom:12px;display:block}
+.fit-goal-label{font-family:'Playfair Display',serif;font-size:17px;margin-bottom:4px}
+.fit-goal-tagline{font-size:11px;opacity:.8;line-height:1.4}
+.fit-goal-meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.fit-goal-chip{font-size:9px;font-weight:700;padding:3px 8px;border-radius:20px;background:rgba(0,0,0,.35);text-transform:uppercase;letter-spacing:.5px}
+
+/* ─── GOAL PROGRAM VIEW ─── */
+.gp-hero{border-radius:20px;padding:28px 24px;margin-bottom:24px}
+.gp-hero-title{font-family:'Playfair Display',serif;font-size:26px;margin-bottom:6px}
+.gp-hero-tagline{font-size:13px;opacity:.85;margin-bottom:14px}
+.gp-hero-meta{display:flex;gap:10px;flex-wrap:wrap}
+.gp-meta-chip{font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;background:rgba(0,0,0,.3);text-transform:uppercase;letter-spacing:.5px}
+.gp-section-title{font-family:'Playfair Display',serif;font-size:18px;margin-bottom:14px}
+.gp-schedule{border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:28px}
+.gp-sched-row{display:grid;grid-template-columns:56px 130px 1fr 70px;gap:10px;padding:11px 14px;border-bottom:1px solid var(--border);align-items:center}
+.gp-sched-row:last-child{border-bottom:none}
+.gp-sched-day{font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--amber)}
+.gp-sched-focus{font-size:12px;color:var(--t2)}
+.gp-sched-exs{display:flex;flex-wrap:wrap;gap:4px}
+.gp-sched-ex-chip{background:var(--surface);border:1px solid var(--border);padding:2px 7px;border-radius:20px;font-size:10px;color:var(--t2)}
+.gp-sched-dur{font-size:11px;color:var(--t3);text-align:right}
+.gp-nutrition{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:28px}
+.gp-macro-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px}
+.gp-macro-title{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px}
+.gp-macro-bar{display:flex;height:10px;border-radius:8px;overflow:hidden;margin:8px 0 12px}
+.gp-food-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.gp-food-chip{font-size:11px;padding:4px 10px;border-radius:20px;background:var(--gdim);color:var(--green);border:1px solid rgba(90,171,110,.2)}
+.gp-food-limit{background:var(--rdim);color:var(--red);border-color:rgba(224,85,85,.2)}
+.gp-apply-btn{width:100%;padding:16px;background:linear-gradient(135deg,var(--amber),#C06010);color:#000;border:none;border-radius:14px;font-family:'Playfair Display',serif;font-size:18px;font-weight:700;cursor:pointer;transition:all .2s;margin-bottom:12px}
+.gp-apply-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(232,160,48,.4)}
+@media(max-width:700px){.fit-gender-grid{grid-template-columns:1fr}.fit-goal-grid{grid-template-columns:repeat(2,1fr)}.gp-nutrition{grid-template-columns:1fr}.gp-sched-row{grid-template-columns:44px 1fr 54px}}
+@media(max-width:480px){.fit-goal-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -746,6 +791,218 @@ const FITNESS_EXERCISES=[
   {id:'burpees',      name:'Burpees',             group:'cardio',   secondary:['chest','core'],        calPerMin:10, level:'Intermediate', sets:'3 × 10',   emoji:'🔥', bg:'#2A1616', color:'#E05555', desc:'Squat → jump back to plank → push-up → jump forward → jump up. Full body in one move.', yt:'auBLPXO8Fww'},
   {id:'kb_swing',     name:'Kettlebell Swing',    group:'cardio',   secondary:['glutes','back'],       calPerMin:10, level:'Beginner',     sets:'4 × 20',   emoji:'🔔', bg:'#2A1616', color:'#E05555', desc:'Hip hinge power movement — not a squat. Snap hips forward. Swing to shoulder height.', yt:'mKDIuUbH94Q'},
 ];
+
+// ═══════════════════════════════════════════════
+//  GOAL PROGRAMS  (female + male)
+// ═══════════════════════════════════════════════
+const GOAL_PROGRAMS={
+female:[
+  {id:'bigger_booty',label:'Bigger Booty',tagline:'Grow & Lift Your Glutes',emoji:'🍑',color:'#F97316',dim:'#2A1A0C',
+   desc:'Build a rounder, lifted, stronger booty through targeted glute training. You\'ll feel it on day one.',
+   bodyGoal:'Rounder & Lifted Glutes',timeline:'8–12 weeks',level:'All Levels',
+   schedule:[
+     {day:'Mon',focus:'Glutes & Hamstrings',exIds:['hip_thrust','rdl','glute_bridge','kickback','sumo_squat'],woType:'💪 Strength',dur:'45 min'},
+     {day:'Tue',focus:'Active Recovery',exIds:['running'],woType:'🏃 Cardio',dur:'30 min'},
+     {day:'Wed',focus:'Quads & Legs',exIds:['goblet','lunges','leg_press','calf_raise'],woType:'💪 Strength',dur:'45 min'},
+     {day:'Thu',focus:'Rest',exIds:[],woType:'😴 Rest',dur:''},
+     {day:'Fri',focus:'Glutes — Heavy Day',exIds:['hip_thrust','rdl','sumo_squat','kickback'],woType:'💪 Strength',dur:'50 min'},
+     {day:'Sat',focus:'Full Body Cardio',exIds:['jump_rope','jjacks','burpees'],woType:'⚡ HIIT',dur:'30 min'},
+     {day:'Sun',focus:'Rest & Stretch',exIds:[],woType:'🧘 Yoga',dur:'20 min'},
+   ],
+   calorieAdjust:150,protein:'0.8g per lb bodyweight',macros:{p:35,c:40,f:25},
+   topFoods:['Chicken Breast','Greek Yogurt','Salmon','Sweet Potato','Brown Rice','Eggs','Avocado','Berries'],
+   limitFoods:['Alcohol','Processed snacks','Excess sugar','Deep-fried food'],
+   mealSuggestions:{Breakfast:['Greek Yogurt & Granola','Scrambled Eggs','Smoothie Bowl'],Lunch:['Grilled Chicken Wrap','Burrito Bowl','Chicken Salad'],Dinner:['Grilled Salmon','Chicken Stir Fry','Steak & Potatoes']}},
+
+  {id:'sculpted_legs',label:'Sculpted Legs',tagline:'Toned, Defined Legs',emoji:'🦵',color:'#2DD4BF',dim:'#0D2420',
+   desc:'Define and tone your legs with squats, lunges and cardio. Lean legs, no bulk.',
+   bodyGoal:'Lean & Defined Legs',timeline:'6–10 weeks',level:'All Levels',
+   schedule:[
+     {day:'Mon',focus:'Quad Focus',exIds:['goblet','leg_press','lunges','calf_raise'],woType:'💪 Strength',dur:'45 min'},
+     {day:'Tue',focus:'Cardio Burn',exIds:['jump_rope','cycling','jjacks'],woType:'🏃 Cardio',dur:'30 min'},
+     {day:'Wed',focus:'Hamstrings & Glutes',exIds:['rdl','leg_curl','hip_thrust','sumo_squat'],woType:'💪 Strength',dur:'45 min'},
+     {day:'Thu',focus:'Rest',exIds:[],woType:'😴 Rest',dur:''},
+     {day:'Fri',focus:'Full Legs — Blast',exIds:['squat','lunges','rdl','leg_press','calf_raise'],woType:'💪 Strength',dur:'50 min'},
+     {day:'Sat',focus:'HIIT Cardio',exIds:['hiit_sprint','burpees','jjacks'],woType:'⚡ HIIT',dur:'25 min'},
+     {day:'Sun',focus:'Rest',exIds:[],woType:'😴 Rest',dur:''},
+   ],
+   calorieAdjust:-200,protein:'0.8g per lb bodyweight',macros:{p:35,c:35,f:30},
+   topFoods:['Chicken Breast','Greek Yogurt','Eggs','Broccoli','Sweet Potato','Salmon','Almonds','Berries'],
+   limitFoods:['Sugary drinks','Late-night carbs','Processed food','Alcohol'],
+   mealSuggestions:{Breakfast:['Scrambled Eggs','Greek Yogurt & Granola','Overnight Oats'],Lunch:['Grilled Chicken Wrap','Caesar Salad','Turkey Sandwich'],Dinner:['Grilled Salmon','Chicken Stir Fry','Veggie Curry']}},
+
+  {id:'toned_arms',label:'Sleek Arms',tagline:'Defined, Feminine Arms',emoji:'💪',color:'#A78BFA',dim:'#1E1A36',
+   desc:'Sculpt lean, toned arms without bulk. Light weight, higher reps, real results.',
+   bodyGoal:'Lean & Toned Arms',timeline:'6–8 weeks',level:'Beginner',
+   schedule:[
+     {day:'Mon',focus:'Arms & Shoulders',exIds:['curl','lat_raise','ohp','hammer','pushup'],woType:'💪 Strength',dur:'40 min'},
+     {day:'Tue',focus:'Cardio',exIds:['running','jjacks'],woType:'🏃 Cardio',dur:'30 min'},
+     {day:'Wed',focus:'Triceps & Core',exIds:['tdips','oh_ext','pushdown','plank','crunch'],woType:'💪 Strength',dur:'35 min'},
+     {day:'Thu',focus:'Active Recovery',exIds:['cycling'],woType:'🏃 Cardio',dur:'20 min'},
+     {day:'Fri',focus:'Full Upper Body',exIds:['curl','lat_raise','tdips','ohp','plank'],woType:'💪 Strength',dur:'45 min'},
+     {day:'Sat',focus:'HIIT',exIds:['jjacks','burpees','jump_rope'],woType:'⚡ HIIT',dur:'25 min'},
+     {day:'Sun',focus:'Rest',exIds:[],woType:'😴 Rest',dur:''},
+   ],
+   calorieAdjust:-100,protein:'0.7g per lb bodyweight',macros:{p:30,c:40,f:30},
+   topFoods:['Eggs','Chicken Breast','Greek Yogurt','Almonds','Berries','Avocado','Brown Rice','Salmon'],
+   limitFoods:['Excess sugar','Processed snacks','Alcohol','Refined carbs'],
+   mealSuggestions:{Breakfast:['Scrambled Eggs','Greek Yogurt & Granola','Smoothie Bowl'],Lunch:['Caesar Salad','Turkey Sandwich','Grilled Chicken Wrap'],Dinner:['Grilled Salmon','Chicken Stir Fry','Pasta Primavera']}},
+
+  {id:'hourglass',label:'Hourglass Figure',tagline:'Define Your Curves',emoji:'⌛',color:'#E8A030',dim:'#3A2E14',
+   desc:'Wider shoulders + fuller glutes + toned waist = classic feminine curves.',
+   bodyGoal:'Defined Waist, Full Glutes & Shoulders',timeline:'10–14 weeks',level:'Intermediate',
+   schedule:[
+     {day:'Mon',focus:'Glutes & Lower Body',exIds:['hip_thrust','sumo_squat','rdl','kickback'],woType:'💪 Strength',dur:'45 min'},
+     {day:'Tue',focus:'Shoulders & Upper Back',exIds:['ohp','lat_raise','face_pull','bent_row'],woType:'💪 Strength',dur:'40 min'},
+     {day:'Wed',focus:'Core Sculpt',exIds:['plank','russian','bicycle','leg_raise','crunch'],woType:'💪 Strength',dur:'35 min'},
+     {day:'Thu',focus:'Cardio + Core',exIds:['running','russian','plank'],woType:'🏃 Cardio',dur:'30 min'},
+     {day:'Fri',focus:'Full Body Combo',exIds:['hip_thrust','ohp','goblet','lat_raise','plank'],woType:'💪 Strength',dur:'50 min'},
+     {day:'Sat',focus:'HIIT Cardio',exIds:['hiit_sprint','jjacks','burpees'],woType:'⚡ HIIT',dur:'25 min'},
+     {day:'Sun',focus:'Rest',exIds:[],woType:'😴 Rest',dur:''},
+   ],
+   calorieAdjust:100,protein:'0.8g per lb bodyweight',macros:{p:35,c:38,f:27},
+   topFoods:['Chicken Breast','Salmon','Sweet Potato','Brown Rice','Greek Yogurt','Avocado','Berries','Eggs'],
+   limitFoods:['Alcohol','Bloating foods','Processed sugar','Fast food'],
+   mealSuggestions:{Breakfast:['Greek Yogurt & Granola','Smoothie Bowl','Avocado Toast'],Lunch:['Burrito Bowl','Grilled Chicken Wrap','Cobb Salad'],Dinner:['Grilled Salmon','Chicken Tikka Masala','Chicken Stir Fry']}},
+
+  {id:'lean_toned',label:'Lean & Toned',tagline:'Burn Fat, Build Tone',emoji:'🔥',color:'#E05555',dim:'#2A1616',
+   desc:'Lose body fat while building lean muscle. HIIT + compound lifts. Most effective combo.',
+   bodyGoal:'Lower Body Fat, Visible Tone',timeline:'8–12 weeks',level:'All Levels',
+   schedule:[
+     {day:'Mon',focus:'HIIT Circuit',exIds:['burpees','jjacks','jump_rope','hiit_sprint'],woType:'⚡ HIIT',dur:'30 min'},
+     {day:'Tue',focus:'Strength Full Body',exIds:['goblet','pushup','rdl','plank','lat_pull'],woType:'💪 Strength',dur:'40 min'},
+     {day:'Wed',focus:'Cardio',exIds:['running','cycling'],woType:'🏃 Cardio',dur:'35 min'},
+     {day:'Thu',focus:'Rest',exIds:[],woType:'😴 Rest',dur:''},
+     {day:'Fri',focus:'HIIT + Core',exIds:['burpees','hiit_sprint','plank','russian','bicycle'],woType:'⚡ HIIT',dur:'35 min'},
+     {day:'Sat',focus:'Strength Circuit',exIds:['goblet','lunges','pushup','kb_swing','crunch'],woType:'💪 Strength',dur:'40 min'},
+     {day:'Sun',focus:'Active Recovery',exIds:['rowing'],woType:'🏃 Cardio',dur:'20 min'},
+   ],
+   calorieAdjust:-400,protein:'1g per lb bodyweight',macros:{p:40,c:30,f:30},
+   topFoods:['Chicken Breast','Eggs','Greek Yogurt','Broccoli','Spinach','Salmon','Berries','Almonds'],
+   limitFoods:['Alcohol','Refined carbs','Excess sugar','Fast food','Processed snacks'],
+   mealSuggestions:{Breakfast:['Scrambled Eggs','Greek Yogurt & Granola','Smoothie Bowl'],Lunch:['Chicken Salad','Caesar Salad','Grilled Chicken Wrap'],Dinner:['Grilled Salmon','Chicken Stir Fry','Veggie Curry']}},
+
+  {id:'flexible_fit',label:'Flexible & Fit',tagline:'Balance, Tone & Mobility',emoji:'🧘',color:'#4CAF7C',dim:'#0F2018',
+   desc:'Full-body fitness through yoga-inspired movement, core work, and light cardio. Feel amazing.',
+   bodyGoal:'Lean, Flexible & Energized',timeline:'6–8 weeks',level:'Beginner',
+   schedule:[
+     {day:'Mon',focus:'Core & Yoga',exIds:['plank','dead_bug','russian','bicycle'],woType:'🧘 Yoga',dur:'30 min'},
+     {day:'Tue',focus:'Light Cardio',exIds:['running','jump_rope'],woType:'🏃 Cardio',dur:'25 min'},
+     {day:'Wed',focus:'Full Body Flow',exIds:['goblet','pushup','glute_bridge','crunch'],woType:'💪 Strength',dur:'35 min'},
+     {day:'Thu',focus:'Rest',exIds:[],woType:'😴 Rest',dur:''},
+     {day:'Fri',focus:'Core Deep Dive',exIds:['plank','leg_raise','russian','ab_wheel'],woType:'💪 Strength',dur:'30 min'},
+     {day:'Sat',focus:'Cardio Walk / Jog',exIds:['jjacks','running'],woType:'🏃 Cardio',dur:'30 min'},
+     {day:'Sun',focus:'Stretch & Rest',exIds:[],woType:'🧘 Yoga',dur:'20 min'},
+   ],
+   calorieAdjust:-200,protein:'0.7g per lb bodyweight',macros:{p:30,c:45,f:25},
+   topFoods:['Avocado','Greek Yogurt','Berries','Salmon','Eggs','Almonds','Sweet Potato','Spinach'],
+   limitFoods:['Processed food','Alcohol','Excess sugar','Heavy fried food'],
+   mealSuggestions:{Breakfast:['Smoothie Bowl','Greek Yogurt & Granola','Avocado Toast'],Lunch:['Garden Salad','Veggie Wrap','Pasta Salad'],Dinner:['Veggie Curry','Pasta Primavera','Grilled Salmon']}},
+],
+
+male:[
+  {id:'build_mass',label:'Build Muscle',tagline:'Add Serious Size & Mass',emoji:'💪',color:'#A78BFA',dim:'#1E1A36',
+   desc:'Progressive overload compound training to pack on muscle mass. The classic bulk.',
+   bodyGoal:'Bigger, More Muscular Build',timeline:'12–16 weeks',level:'Intermediate',
+   schedule:[
+     {day:'Mon',focus:'Chest & Triceps',exIds:['bench','incline','dbell_fly','skull_crush','tdips'],woType:'💪 Strength',dur:'55 min'},
+     {day:'Tue',focus:'Back & Biceps',exIds:['deadlift','bent_row','pullup','curl','hammer'],woType:'💪 Strength',dur:'55 min'},
+     {day:'Wed',focus:'Light Cardio',exIds:['running'],woType:'🏃 Cardio',dur:'25 min'},
+     {day:'Thu',focus:'Shoulders & Arms',exIds:['ohp','lat_raise','arnold','curl','tdips','face_pull'],woType:'💪 Strength',dur:'50 min'},
+     {day:'Fri',focus:'Legs — Heavy',exIds:['squat','rdl','leg_press','leg_curl','calf_raise'],woType:'💪 Strength',dur:'55 min'},
+     {day:'Sat',focus:'Full Body Compound',exIds:['bench','bent_row','squat','ohp'],woType:'💪 Strength',dur:'50 min'},
+     {day:'Sun',focus:'Rest',exIds:[],woType:'😴 Rest',dur:''},
+   ],
+   calorieAdjust:350,protein:'1g per lb bodyweight',macros:{p:35,c:45,f:20},
+   topFoods:['Chicken Breast','Ground Beef','Eggs','Brown Rice','Sweet Potato','Greek Yogurt','Salmon','Protein Shake'],
+   limitFoods:['Alcohol','Empty calories','Excess sugar','Processed fast food'],
+   mealSuggestions:{Breakfast:['Big Breakfast McDonald\'s','Scrambled Eggs','Breakfast Burrito'],Lunch:['Burrito Bowl','Grilled Chicken Wrap','Steak & Potatoes'],Dinner:['Spaghetti Bolognese','Chicken Tikka Masala','BBQ Chicken']}},
+
+  {id:'get_stronger',label:'Get Stronger',tagline:'Powerlifting-Style Training',emoji:'🏋️',color:'#FACC15',dim:'#2A2400',
+   desc:'Low rep, heavy compound lifts to maximize raw strength. Squat. Bench. Deadlift. Repeat.',
+   bodyGoal:'Maximum Strength + Dense Muscle',timeline:'12–20 weeks',level:'Intermediate',
+   schedule:[
+     {day:'Mon',focus:'Squat Day',exIds:['squat','goblet','leg_press','rdl'],woType:'💪 Strength',dur:'60 min'},
+     {day:'Tue',focus:'Bench Day',exIds:['bench','incline','chest_dips','cg_bench'],woType:'💪 Strength',dur:'55 min'},
+     {day:'Wed',focus:'Rest',exIds:[],woType:'😴 Rest',dur:''},
+     {day:'Thu',focus:'Deadlift Day',exIds:['deadlift','rdl','bent_row','lat_pull'],woType:'💪 Strength',dur:'55 min'},
+     {day:'Fri',focus:'Overhead Press',exIds:['ohp','lat_raise','face_pull','shrugs'],woType:'💪 Strength',dur:'50 min'},
+     {day:'Sat',focus:'Accessory Work',exIds:['curl','hammer','tdips','skull_crush','plank'],woType:'💪 Strength',dur:'40 min'},
+     {day:'Sun',focus:'Rest',exIds:[],woType:'😴 Rest',dur:''},
+   ],
+   calorieAdjust:400,protein:'1.1g per lb bodyweight',macros:{p:35,c:45,f:20},
+   topFoods:['Steak 6oz','Eggs','Brown Rice','Sweet Potato','Whole Milk 8oz','Ground Beef 4oz','Salmon','Protein Shake'],
+   limitFoods:['Alcohol','Junk food','Excess cardio'],
+   mealSuggestions:{Breakfast:['Big Breakfast McDonald\'s','Breakfast Burrito','Pancakes 2'],Lunch:['Steak & Potatoes','Burrito Bowl','Spaghetti Bolognese'],Dinner:['Beef Stew','BBQ Chicken','Spaghetti Bolognese']}},
+
+  {id:'shred_cut',label:'Shred & Cut',tagline:'Burn Fat, Show Muscle',emoji:'🔥',color:'#E05555',dim:'#2A1616',
+   desc:'Cut body fat while preserving muscle. HIIT + compound supersets. Visible abs await.',
+   bodyGoal:'Low Body Fat + Visible Definition',timeline:'8–12 weeks',level:'Intermediate',
+   schedule:[
+     {day:'Mon',focus:'Upper Body + HIIT',exIds:['bench','bent_row','hiit_sprint','burpees'],woType:'⚡ HIIT',dur:'45 min'},
+     {day:'Tue',focus:'Legs + Cardio',exIds:['squat','rdl','jump_rope','jjacks'],woType:'💪 Strength',dur:'45 min'},
+     {day:'Wed',focus:'HIIT + Abs',exIds:['hiit_sprint','burpees','plank','bicycle','russian'],woType:'⚡ HIIT',dur:'35 min'},
+     {day:'Thu',focus:'Rest',exIds:[],woType:'😴 Rest',dur:''},
+     {day:'Fri',focus:'Full Body Circuit',exIds:['kb_swing','pushup','goblet','pullup','burpees'],woType:'⚡ HIIT',dur:'40 min'},
+     {day:'Sat',focus:'Steady State Cardio',exIds:['running','rowing'],woType:'🏃 Cardio',dur:'40 min'},
+     {day:'Sun',focus:'Rest',exIds:[],woType:'😴 Rest',dur:''},
+   ],
+   calorieAdjust:-500,protein:'1.2g per lb bodyweight',macros:{p:45,c:25,f:30},
+   topFoods:['Chicken Breast','Eggs','Greek Yogurt','Broccoli Cup','Salmon','Almonds 1oz','Berries','Spinach'],
+   limitFoods:['Alcohol','Bread','Refined carbs','Sugar','Fast food'],
+   mealSuggestions:{Breakfast:['Scrambled Eggs','Greek Yogurt & Granola','Overnight Oats'],Lunch:['Chicken Salad','Grilled Chicken Wrap','Caesar Salad'],Dinner:['Grilled Salmon','Chicken Stir Fry','Chicken Tikka Masala']}},
+
+  {id:'big_upper',label:'Big Chest & Arms',tagline:'Build Your Upper Body',emoji:'👑',color:'#F97316',dim:'#2A1A0C',
+   desc:'Laser-focused upper body hypertrophy — chest, back, arms, shoulders. Build that V-taper.',
+   bodyGoal:'Wide Chest, Big Arms & V-Taper',timeline:'10–14 weeks',level:'Intermediate',
+   schedule:[
+     {day:'Mon',focus:'Chest Day',exIds:['bench','incline','cable_fly','dbell_fly','pushup'],woType:'💪 Strength',dur:'55 min'},
+     {day:'Tue',focus:'Back Day',exIds:['pullup','bent_row','lat_pull','seated_row','deadlift'],woType:'💪 Strength',dur:'55 min'},
+     {day:'Wed',focus:'Shoulders',exIds:['ohp','lat_raise','arnold','face_pull','shrugs'],woType:'💪 Strength',dur:'45 min'},
+     {day:'Thu',focus:'Arms Day',exIds:['curl','hammer','conc_curl','tdips','skull_crush','pushdown'],woType:'💪 Strength',dur:'45 min'},
+     {day:'Fri',focus:'Chest + Triceps',exIds:['bench','incline','chest_dips','cg_bench','pushdown'],woType:'💪 Strength',dur:'55 min'},
+     {day:'Sat',focus:'Light Cardio + Core',exIds:['running','plank','crunch'],woType:'🏃 Cardio',dur:'30 min'},
+     {day:'Sun',focus:'Rest',exIds:[],woType:'😴 Rest',dur:''},
+   ],
+   calorieAdjust:300,protein:'1g per lb bodyweight',macros:{p:35,c:45,f:20},
+   topFoods:['Chicken Breast','Eggs','Protein Shake','Brown Rice','Greek Yogurt','Salmon','Sweet Potato','Almonds 1oz'],
+   limitFoods:['Alcohol','Excess fat','Sugar','Processed food'],
+   mealSuggestions:{Breakfast:['Scrambled Eggs','Breakfast Burrito','Oatmeal Bowl'],Lunch:['Chicken Stir Fry','Grilled Chicken Wrap','Burrito Bowl'],Dinner:['Grilled Salmon','Spaghetti Bolognese','BBQ Chicken']}},
+
+  {id:'leg_power',label:'Leg Power',tagline:'Build Powerful Legs',emoji:'🦵',color:'#2DD4BF',dim:'#0D2420',
+   desc:'Build massive, powerful legs through heavy squats and compound work. Don\'t skip leg day.',
+   bodyGoal:'Powerful, Muscular Legs',timeline:'10–14 weeks',level:'Intermediate',
+   schedule:[
+     {day:'Mon',focus:'Heavy Squat Day',exIds:['squat','goblet','leg_press','calf_raise'],woType:'💪 Strength',dur:'55 min'},
+     {day:'Tue',focus:'Upper Body (Light)',exIds:['bench','bent_row','curl'],woType:'💪 Strength',dur:'40 min'},
+     {day:'Wed',focus:'Hamstring Focus',exIds:['rdl','leg_curl','hip_thrust','glute_bridge'],woType:'💪 Strength',dur:'45 min'},
+     {day:'Thu',focus:'Rest',exIds:[],woType:'😴 Rest',dur:''},
+     {day:'Fri',focus:'Full Leg Blast',exIds:['squat','rdl','lunges','leg_press','leg_curl','calf_raise'],woType:'💪 Strength',dur:'60 min'},
+     {day:'Sat',focus:'Cardio + Core',exIds:['cycling','plank','crunch'],woType:'🏃 Cardio',dur:'30 min'},
+     {day:'Sun',focus:'Rest',exIds:[],woType:'😴 Rest',dur:''},
+   ],
+   calorieAdjust:250,protein:'1g per lb bodyweight',macros:{p:35,c:45,f:20},
+   topFoods:['Steak 6oz','Chicken Breast','Brown Rice','Sweet Potato','Eggs','Greek Yogurt','Salmon','Protein Shake'],
+   limitFoods:['Alcohol','Processed food','Excess sugar','Refined carbs'],
+   mealSuggestions:{Breakfast:['Breakfast Burrito','Oatmeal Bowl','Scrambled Eggs'],Lunch:['Steak & Potatoes','Burrito Bowl','Grilled Chicken Wrap'],Dinner:['Beef Stew','Chicken Stir Fry','Spaghetti Bolognese']}},
+
+  {id:'athletic',label:'Athletic Build',tagline:'Explosive & Functional',emoji:'⚡',color:'#5B9BD5',dim:'#162236',
+   desc:'Build athletic power, speed, and endurance. Train like an athlete — look like one.',
+   bodyGoal:'Lean, Athletic & Explosive Body',timeline:'8–12 weeks',level:'Intermediate',
+   schedule:[
+     {day:'Mon',focus:'Power Day',exIds:['squat','bench','kb_swing','burpees'],woType:'⚡ HIIT',dur:'45 min'},
+     {day:'Tue',focus:'Cardio + Agility',exIds:['hiit_sprint','jump_rope','box_jump'],woType:'🏃 Cardio',dur:'35 min'},
+     {day:'Wed',focus:'Upper Body Pull',exIds:['pullup','bent_row','lat_pull','curl'],woType:'💪 Strength',dur:'45 min'},
+     {day:'Thu',focus:'Legs + Explosive',exIds:['squat','rdl','box_jump','kb_swing'],woType:'⚡ HIIT',dur:'45 min'},
+     {day:'Fri',focus:'Full Body Circuit',exIds:['kb_swing','pushup','goblet','pullup','jjacks'],woType:'⚡ HIIT',dur:'40 min'},
+     {day:'Sat',focus:'Long Run / Row',exIds:['running','rowing'],woType:'🏃 Cardio',dur:'40 min'},
+     {day:'Sun',focus:'Rest',exIds:[],woType:'😴 Rest',dur:''},
+   ],
+   calorieAdjust:0,protein:'0.9g per lb bodyweight',macros:{p:30,c:50,f:20},
+   topFoods:['Chicken Breast','Brown Rice','Sweet Potato','Banana','Greek Yogurt','Salmon','Eggs','Sports Drink 20oz'],
+   limitFoods:['Alcohol','Excess fat','Heavy pre-workout meals','Processed food'],
+   mealSuggestions:{Breakfast:['Oatmeal Bowl','Smoothie Bowl','Overnight Oats'],Lunch:['Grilled Chicken Wrap','Burrito Bowl','Chicken Stir Fry'],Dinner:['Grilled Salmon','Chicken Stir Fry','Pasta Primavera']}},
+]};
 
 // ── Workout MET values (metabolic equivalent) ──
 const WO_METS={'💪 Strength':4.0,'🏃 Cardio':8.0,'⚡ HIIT':10.0,'🧘 Yoga':2.8,'🚶 Walk':3.0,'🚴 Cycling':7.0,'🏊 Swim':7.0,'😴 Rest':1.0};
@@ -1370,6 +1627,9 @@ let ST={
   foodLogTarget:null,flPending:null,
   profileGoal:null,
   fitMuscle:'all',
+  fitGender:null,
+  fitGoal:null,
+  fitBrowseLib:false,
 };
 
 // ═══════════════════════════════════════════════
@@ -1856,36 +2116,190 @@ function buildBodySVG(active){
 }
 
 function renderFitnessView(){
-  const filtered=ST.fitMuscle==='all'?FITNESS_EXERCISES:FITNESS_EXERCISES.filter(e=>e.group===ST.fitMuscle||e.secondary.includes(ST.fitMuscle));
+  if(ST.fitBrowseLib) return renderExerciseLibrary();
+  if(!ST.fitGender)   return renderFitnessGenderPicker();
+  if(!ST.fitGoal)     return renderFitnessGoalPicker(ST.fitGender);
+  return renderGoalProgram(ST.fitGender, ST.fitGoal);
+}
+
+function renderFitnessGenderPicker(){
+  return`<div class="fit-wrap" style="animation:fadeIn .4s ease">
+    <div style="text-align:center;margin-bottom:32px">
+      <div style="font-family:'Playfair Display',serif;font-size:30px;margin-bottom:10px">Your Fitness Journey</div>
+      <div style="font-size:13px;color:var(--t2);max-width:420px;margin:0 auto;line-height:1.6">Choose your path to get a personalized workout plan, meal suggestions, and auto-generated grocery list</div>
+    </div>
+    <div class="fit-gender-grid">
+      <div class="fit-gender-card" onclick="selectGender('female')" style="background:linear-gradient(135deg,#2A1A10,#1A1412);border-color:#F97316">
+        <span class="fit-gender-emoji">👩</span>
+        <div class="fit-gender-title" style="color:#F97316">Women's Programs</div>
+        <div class="fit-gender-sub">Bigger booty · Sculpted legs · Sleek arms · Hourglass figure · Lean & toned · Flexible & fit</div>
+      </div>
+      <div class="fit-gender-card" onclick="selectGender('male')" style="background:linear-gradient(135deg,#0F1A2A,#0C1018);border-color:#5B9BD5">
+        <span class="fit-gender-emoji">👨</span>
+        <div class="fit-gender-title" style="color:#5B9BD5">Men's Programs</div>
+        <div class="fit-gender-sub">Build mass · Get stronger · Shred & cut · Big upper body · Leg power · Athletic performance</div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:20px">
+      <button class="btn" onclick="showExerciseLibrary()">Browse Exercise Library →</button>
+    </div>
+  </div>`;
+}
+
+function renderFitnessGoalPicker(gender){
+  const programs=GOAL_PROGRAMS[gender];
+  const cards=programs.map(p=>`
+    <div class="fit-goal-card" onclick="selectGoal('${p.id}')"
+      style="background:linear-gradient(135deg,${p.dim},var(--card));border-color:${p.color}40">
+      <span class="fit-goal-emoji">${p.emoji}</span>
+      <div class="fit-goal-label" style="color:${p.color}">${p.label}</div>
+      <div class="fit-goal-tagline" style="color:rgba(240,237,230,.7)">${p.tagline}</div>
+      <div class="fit-goal-meta">
+        <span class="fit-goal-chip" style="color:${p.color}">${p.timeline}</span>
+        <span class="fit-goal-chip" style="color:var(--t2)">${p.level}</span>
+      </div>
+    </div>`).join('');
+  return`<div class="fit-wrap" style="animation:fadeIn .3s ease">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+      <button class="btn" onclick="selectGender(null)">← Back</button>
+      <div>
+        <div style="font-family:'Playfair Display',serif;font-size:22px">${gender==='female'?'👩 Women\'s Programs':'👨 Men\'s Programs'}</div>
+        <div style="font-size:11px;color:var(--t3);margin-top:2px">Choose your goal to get a complete plan</div>
+      </div>
+    </div>
+    <div class="fit-goal-grid">${cards}</div>
+  </div>`;
+}
+
+function renderGoalProgram(gender, goalId){
+  const prog=(GOAL_PROGRAMS[gender]||[]).find(p=>p.id===goalId);
+  if(!prog) return renderFitnessGoalPicker(gender);
+
+  const DAY_ORDER=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const schedRows=prog.schedule.map(s=>{
+    const isRest=s.exIds.length===0;
+    const exChips=s.exIds.map(id=>{
+      const ex=FITNESS_EXERCISES.find(e=>e.id===id);
+      return ex?`<span class="gp-sched-ex-chip">${ex.name}</span>`:'';
+    }).join('');
+    return`<div class="gp-sched-row${isRest?' gp-sched-row-rest':''}">
+      <div class="gp-sched-day">${s.day}</div>
+      <div class="gp-sched-focus" style="color:${isRest?'var(--t3)':'var(--t2)'}">${s.woType} ${s.focus}</div>
+      <div class="gp-sched-exs">${isRest?'<span style="font-size:11px;color:var(--t3)">Rest & recover</span>':exChips}</div>
+      <div class="gp-sched-dur" style="color:${isRest?'var(--t3)':'var(--amber)'}">${s.dur}</div>
+    </div>`;
+  }).join('');
+
+  const {p:pct,c:cct,f:fct}=prog.macros;
+  const macroBar=`<div class="gp-macro-bar">
+    <div style="width:${pct}%;background:var(--blue);border-radius:8px 0 0 8px"></div>
+    <div style="width:${cct}%;background:var(--amber);margin:0 2px"></div>
+    <div style="width:${fct}%;background:var(--red);border-radius:0 8px 8px 0"></div>
+  </div>`;
+
+  const topFoodChips=prog.topFoods.map(f=>`<span class="gp-food-chip">${f}</span>`).join('');
+  const limitChips=prog.limitFoods.map(f=>`<span class="gp-food-chip gp-food-limit">${f}</span>`).join('');
+
   const todayKey=dk(new Date());
   const wk=S.get('workouts',{});
   const todayWo=wk[todayKey];
+  const activeProg=S.get('active_program',null);
+  const isActive=activeProg&&activeProg.gender===gender&&activeProg.goalId===goalId;
 
+  return`<div class="fit-wrap" style="animation:fadeIn .3s ease">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+      <button class="btn" onclick="selectGoal(null)">← Back</button>
+      <button class="btn" onclick="showExerciseLibrary()" style="margin-left:auto">Browse All Exercises →</button>
+    </div>
+
+    <div class="gp-hero" style="background:linear-gradient(135deg,${prog.dim},rgba(26,25,22,0.8));border:1px solid ${prog.color}30">
+      <div style="font-size:40px;margin-bottom:12px">${prog.emoji}</div>
+      <div class="gp-hero-title" style="color:${prog.color}">${prog.label}</div>
+      <div class="gp-hero-tagline">${prog.desc}</div>
+      <div class="gp-hero-meta">
+        <span class="gp-meta-chip">🎯 ${prog.bodyGoal}</span>
+        <span class="gp-meta-chip">⏱ ${prog.timeline}</span>
+        <span class="gp-meta-chip">📊 ${prog.level}</span>
+        <span class="gp-meta-chip">🥩 ${prog.protein}</span>
+      </div>
+    </div>
+
+    ${isActive?`<div style="background:var(--gdim);border:1px solid rgba(90,171,110,.3);border-radius:12px;padding:12px 16px;margin-bottom:20px;font-size:12px;color:var(--green);display:flex;align-items:center;gap:8px">
+      ✅ This plan is active on your week! <button class="btn" onclick="clearActiveProgram()" style="margin-left:auto;font-size:11px;color:var(--red);border-color:var(--rdim)">Remove</button>
+    </div>`:''}
+
+    <div class="gp-section-title">📅 Weekly Schedule</div>
+    <div class="gp-schedule">${schedRows}</div>
+
+    <div class="gp-section-title">🥗 Nutrition Guide</div>
+    <div class="gp-nutrition">
+      <div class="gp-macro-card">
+        <div class="gp-macro-title">Macro Split</div>
+        ${macroBar}
+        <div style="display:flex;gap:14px;font-size:11px">
+          <span style="color:var(--blue)">● Protein ${pct}%</span>
+          <span style="color:var(--amber)">● Carbs ${cct}%</span>
+          <span style="color:var(--red)">● Fat ${fct}%</span>
+        </div>
+        <div style="margin-top:12px;font-size:11px;color:var(--t3)">Protein: ${prog.protein}</div>
+        ${prog.calorieAdjust>0?`<div style="font-size:11px;color:var(--green);margin-top:4px">+${prog.calorieAdjust} cal/day above TDEE</div>`:`<div style="font-size:11px;color:var(--red);margin-top:4px">${prog.calorieAdjust} cal/day below TDEE</div>`}
+      </div>
+      <div class="gp-macro-card">
+        <div class="gp-macro-title">Meal Suggestions</div>
+        <div style="font-size:11px;color:var(--bf);font-weight:600;margin-bottom:4px">Breakfast</div>
+        <div style="font-size:11px;color:var(--t2);margin-bottom:8px">${prog.mealSuggestions.Breakfast.join(' · ')}</div>
+        <div style="font-size:11px;color:var(--lu);font-weight:600;margin-bottom:4px">Lunch</div>
+        <div style="font-size:11px;color:var(--t2);margin-bottom:8px">${prog.mealSuggestions.Lunch.join(' · ')}</div>
+        <div style="font-size:11px;color:var(--di);font-weight:600;margin-bottom:4px">Dinner</div>
+        <div style="font-size:11px;color:var(--t2)">${prog.mealSuggestions.Dinner.join(' · ')}</div>
+      </div>
+    </div>
+
+    <div class="gp-section-title">🍎 Foods</div>
+    <div style="margin-bottom:28px">
+      <div style="font-size:11px;color:var(--green);font-weight:600;margin-bottom:8px">✅ Eat These</div>
+      <div class="gp-food-list">${topFoodChips}</div>
+      <div style="font-size:11px;color:var(--red);font-weight:600;margin-top:14px;margin-bottom:8px">🚫 Limit These</div>
+      <div class="gp-food-list">${limitChips}</div>
+    </div>
+
+    <button class="gp-apply-btn" onclick="applyProgramToWeek('${gender}','${goalId}')">
+      ${isActive?'🔄 Re-Apply Plan to This Week':'🚀 Apply This Plan to This Week'}
+    </button>
+    <div style="text-align:center;font-size:11px;color:var(--t3);margin-bottom:32px">
+      Sets workouts + meal suggestions for all 7 days · Auto-generates your grocery list
+    </div>
+
+    ${todayWo?`<div style="background:var(--pdim);border:1px solid rgba(167,139,250,.3);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--purple);margin-bottom:20px">
+      📋 Today: ${todayWo.type} ${todayWo.duration||''}${todayWo.completed?' ✓':''}
+    </div>`:''}
+  </div>`;
+}
+
+function renderExerciseLibrary(){
+  const filtered=ST.fitMuscle==='all'?FITNESS_EXERCISES:FITNESS_EXERCISES.filter(e=>e.group===ST.fitMuscle||e.secondary.includes(ST.fitMuscle));
+  const mg=MUSCLE_GROUPS.find(m=>m.id===ST.fitMuscle)||MUSCLE_GROUPS[0];
   const mgTiles=MUSCLE_GROUPS.map(mg=>{
     const cnt=mg.id==='all'?FITNESS_EXERCISES.length:FITNESS_EXERCISES.filter(e=>e.group===mg.id).length;
     const active=ST.fitMuscle===mg.id;
     return`<div class="mg-tile${active?' active':''}" onclick="selectMuscle('${mg.id}')"
-      style="border-color:${active?mg.color:'var(--border)'};${active?`background:${mg.dim};box-shadow:0 0 16px ${mg.color}30`:''}"
-    >
+      style="border-color:${active?mg.color:'var(--border)'};${active?`background:${mg.dim};box-shadow:0 0 16px ${mg.color}30`:''}">
       <div class="mg-body">${buildBodySVG(active?mg.id:'none')}</div>
       <div class="mg-label" style="color:${active?mg.color:'var(--t2)'}">${mg.label}</div>
       <div class="mg-count">${cnt} exercises</div>
     </div>`;
   }).join('');
-
   const exCards=filtered.map(ex=>{
     const ytUrl=`https://www.youtube.com/watch?v=${ex.yt}`;
     const ytThumb=`https://img.youtube.com/vi/${ex.yt}/mqdefault.jpg`;
     const levelColor=ex.level==='Beginner'?'var(--green)':ex.level==='Intermediate'?'var(--amber)':'var(--red)';
     const levelDim=ex.level==='Beginner'?'var(--gdim)':ex.level==='Intermediate'?'var(--adim)':'var(--rdim)';
-    const mg=MUSCLE_GROUPS.find(m=>m.id===ex.group)||MUSCLE_GROUPS[1];
+    const mgr=MUSCLE_GROUPS.find(m=>m.id===ex.group)||MUSCLE_GROUPS[1];
     const secStr=ex.secondary.map(s=>MUSCLE_GROUPS.find(m=>m.id===s)?.label||s).join(', ');
     return`<div class="ex-card">
-      <div class="ex-thumb" style="background:${ex.bg};min-height:120px" onclick="window.open('${ytUrl}','_blank')" title="Watch tutorial on YouTube">
+      <div class="ex-thumb" style="background:${ex.bg};min-height:120px" onclick="window.open('${ytUrl}','_blank')">
         <img src="${ytThumb}" alt="${ex.name}" style="width:100%;height:100%;object-fit:cover;opacity:.85" onerror="this.style.display='none';this.nextSibling.style.display='flex'" loading="lazy">
-        <div style="display:none;width:100%;height:100%;align-items:center;justify-content:center;font-size:56px;flex-direction:column;gap:6px">
-          <span>${ex.emoji}</span>
-        </div>
+        <div style="display:none;width:100%;height:100%;align-items:center;justify-content:center;font-size:56px"><span>${ex.emoji}</span></div>
         <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.7));padding:8px 10px">
           <span style="font-size:9px;color:#fff;font-weight:700;letter-spacing:.5px">▶ WATCH TUTORIAL</span>
         </div>
@@ -1893,13 +2307,13 @@ function renderFitnessView(){
       <div class="ex-body">
         <div class="ex-name">${ex.name}</div>
         <div class="ex-badges">
-          <span class="ex-badge" style="background:${mg.dim};color:${mg.color}">🎯 ${mg.label}</span>
+          <span class="ex-badge" style="background:${mgr.dim};color:${mgr.color}">🎯 ${mgr.label}</span>
           ${secStr?`<span class="ex-badge" style="background:var(--surface);color:var(--t2)">+ ${secStr}</span>`:''}
           <span class="ex-badge" style="background:${levelDim};color:${levelColor}">${ex.level}</span>
           <span class="ex-badge" style="background:var(--rdim);color:var(--red)">🔥 ~${ex.calPerMin} cal/min</span>
         </div>
         <div class="ex-desc">${ex.desc}</div>
-        <div style="font-size:10px;color:var(--t3);margin-bottom:10px">📋 Suggested: ${ex.sets}</div>
+        <div style="font-size:10px;color:var(--t3);margin-bottom:10px">📋 ${ex.sets}</div>
         <div class="ex-actions">
           <button class="ex-add" onclick="addExerciseToDay('${ex.id}')">+ Add to Today</button>
           <a href="${ytUrl}" target="_blank" class="ex-yt">▶ YouTube</a>
@@ -1907,28 +2321,17 @@ function renderFitnessView(){
       </div>
     </div>`;
   }).join('');
-
-  const mg=MUSCLE_GROUPS.find(m=>m.id===ST.fitMuscle)||MUSCLE_GROUPS[0];
-
-  return`<div class="fit-wrap">
-    <div class="fit-header">
-      <div>
-        <div class="fit-title">💪 Fitness Library</div>
-        <div style="font-size:11px;color:var(--t3);margin-top:3px">Click a muscle group · Tap any card thumbnail to watch a tutorial</div>
-      </div>
-      ${todayWo?`<div style="background:var(--pdim);border:1px solid rgba(167,139,250,.3);border-radius:10px;padding:8px 14px;font-size:12px;color:var(--purple)">
-        Today: ${todayWo.type} ${todayWo.duration||''}${todayWo.completed?' ✓':''}
-      </div>`:'<button class="btn" onclick="openWoEdit(\''+todayKey+'\')" style="border-color:var(--amid);color:var(--amber)">+ Log Today\'s Workout</button>'}
+  return`<div class="fit-wrap" style="animation:fadeIn .3s ease">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
+      <button class="btn" onclick="backFromLibrary()">← Back</button>
+      <div style="font-family:'Playfair Display',serif;font-size:22px">💪 Exercise Library</div>
     </div>
-
     <div class="mg-grid">${mgTiles}</div>
-
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
       <div style="font-family:'Playfair Display',serif;font-size:17px">${mg.id==='all'?'All Exercises':`${mg.emoji} ${mg.label} Exercises`}
         <span style="font-size:12px;color:var(--t3);font-family:'DM Sans',sans-serif;margin-left:8px">${filtered.length} exercises</span>
       </div>
     </div>
-
     ${filtered.length?`<div class="ex-grid">${exCards}</div>`:`<div style="text-align:center;padding:50px 0;color:var(--t3)">
       <div style="font-size:40px;margin-bottom:12px">${mg.emoji}</div>
       <div style="font-family:'Playfair Display',serif;font-size:18px;color:var(--t2);margin-bottom:6px">No exercises found</div>
@@ -1937,7 +2340,54 @@ function renderFitnessView(){
   </div>`;
 }
 
+function selectGender(g){ST.fitGender=g;ST.fitGoal=null;ST.fitBrowseLib=false;render();}
+function selectGoal(id){ST.fitGoal=id;ST.fitBrowseLib=false;render();}
+function showExerciseLibrary(){ST.fitBrowseLib=true;render();}
+function backFromLibrary(){ST.fitBrowseLib=false;render();}
 function selectMuscle(id){ST.fitMuscle=id;render();}
+
+function applyProgramToWeek(gender, goalId){
+  const prog=(GOAL_PROGRAMS[gender]||[]).find(p=>p.id===goalId);
+  if(!prog)return;
+  const dates=getWeekDates(ST.weekOffset);
+  const plans=S.get('plans',{});
+  const wk=S.get('workouts',{});
+  const DAY_IDX={Mon:0,Tue:1,Wed:2,Thu:3,Fri:4,Sat:5,Sun:6};
+
+  prog.schedule.forEach(s=>{
+    const idx=DAY_IDX[s.day];
+    if(idx===undefined)return;
+    const key=dk(dates[idx]);
+    // Set workout
+    if(s.exIds.length>0||s.woType!=='😴 Rest'){
+      const exNames=s.exIds.map(id=>FITNESS_EXERCISES.find(e=>e.id===id)?.name).filter(Boolean);
+      wk[key]={type:s.woType,duration:s.dur,notes:exNames.join('\n'),completed:false};
+    }
+    // Set meals from program suggestions
+    const bf=prog.mealSuggestions.Breakfast;
+    const lu=prog.mealSuggestions.Lunch;
+    const di=prog.mealSuggestions.Dinner;
+    if(!plans[key])plans[key]={};
+    plans[key].Breakfast=bf[idx%bf.length];
+    plans[key].Lunch=lu[idx%lu.length];
+    plans[key].Dinner=di[idx%di.length];
+  });
+
+  S.set('workouts',wk);
+  S.set('plans',plans);
+  S.set('active_program',{gender,goalId});
+
+  // Auto-generate grocery list
+  Grocery.generate(dates);
+
+  toast('🚀',`${prog.label} plan applied! Meals, workouts & grocery list updated.`);
+  render();
+}
+
+function clearActiveProgram(){
+  S.set('active_program',null);
+  render();
+}
 
 function addExerciseToDay(exId){
   const ex=FITNESS_EXERCISES.find(e=>e.id===exId);
@@ -1945,7 +2395,6 @@ function addExerciseToDay(exId){
   const key=dk(new Date());
   const wk=S.get('workouts',{});
   if(!wk[key])wk[key]={type:'💪 Strength',duration:'45 min',notes:'',completed:false};
-  // Append exercise to notes
   const note=wk[key].notes?wk[key].notes+'\n'+ex.name+' '+ex.sets:ex.name+' '+ex.sets;
   wk[key].notes=note;
   wk[key].type='💪 Strength';
