@@ -481,6 +481,35 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .gym-add-inp{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:7px 11px;font-size:12px;color:var(--text);font-family:'DM Sans',sans-serif}
 .gym-add-inp:focus{outline:none;border-color:var(--amber)}
 @media(max-width:600px){.gym-type-grid{grid-template-columns:repeat(2,1fr)}}
+
+/* ─── EXERCISE LIST VIEW ─── */
+.ex-list{display:flex;flex-direction:column;gap:3px}
+.ex-row{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:border-color .15s}
+.ex-row:hover{border-color:rgba(232,160,48,.3)}
+.ex-row.no-eq{opacity:.5}
+.ex-row-hdr{display:grid;grid-template-columns:30px 1fr auto;gap:10px;padding:10px 14px;align-items:center;cursor:pointer;user-select:none}
+.ex-row-emoji{font-size:17px;text-align:center}
+.ex-row-name{font-size:13px;font-weight:600}
+.ex-row-meta{font-size:10px;color:var(--t3);margin-top:2px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.ex-row-right{display:flex;align-items:center;gap:8px}
+.ex-row-cal{font-size:11px;color:var(--red);white-space:nowrap}
+.ex-row-chevron{font-size:10px;color:var(--t3);transition:transform .2s;min-width:10px}
+.ex-row-chevron.open{transform:rotate(90deg);color:var(--amber)}
+.ex-detail{padding:12px 14px 14px;border-top:1px solid var(--border);background:rgba(255,255,255,.018)}
+.ex-detail-desc{font-size:12px;color:var(--t2);line-height:1.6;margin-bottom:10px}
+.ex-detail-why{font-size:11px;color:var(--t2);line-height:1.55;padding:8px 12px;background:rgba(232,160,48,.07);border-left:2px solid var(--amber);border-radius:0 6px 6px 0;margin-bottom:12px}
+.ex-detail-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.ex-eq-tag{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;background:var(--surface);border:1px solid var(--border);color:var(--t3)}
+.ex-eq-tag.avail{background:var(--gdim);border-color:rgba(90,171,110,.3);color:var(--green)}
+.ex-eq-tag.missing{background:var(--rdim);border-color:rgba(224,85,85,.3);color:var(--red)}
+.ex-detail-btns{display:flex;gap:8px;margin-top:4px;flex-wrap:wrap}
+.ex-detail-add{flex:1;min-width:120px;padding:8px 14px;background:var(--amber);color:#000;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif}
+.ex-detail-yt{padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--red);text-decoration:none;display:flex;align-items:center;gap:5px;font-family:'DM Sans',sans-serif;transition:all .15s;white-space:nowrap}
+.ex-detail-yt:hover{border-color:var(--red);background:var(--rdim)}
+
+/* ─── FITNESS GYM BANNER ─── */
+.fit-gym-banner{background:var(--adim);border:1px solid rgba(232,160,48,.25);border-radius:10px;padding:10px 14px;margin-bottom:18px;display:flex;align-items:center;gap:10px;font-size:12px;cursor:pointer;transition:border-color .15s}
+.fit-gym-banner:hover{border-color:var(--amber)}
 </style>
 </head>
 <body>
@@ -884,15 +913,35 @@ const EXERCISE_WHY={
   hiit_bike:'Bike sprints spare the joints while hitting HIIT intensity. Zero impact, maximum calorie burn.',
 };
 
+// ── Equipment required per exercise (bw=bodyweight, db=dumbbells, bb=barbell, cable=cable, machine=machine, pullbar, kb=kettlebell, bench, bands) ──
+const EXERCISE_EQ={
+  pushup:'bw',bench:'bb',incline:'bb',dbell_fly:'db',cable_fly:'cable',chest_dips:'bw',
+  pullup:'pullbar',chinup:'pullbar',lat_pull:'machine',bent_row:'bb',deadlift:'bb',seated_row:'cable',
+  ohp:'bb',lat_raise:'db',face_pull:'cable',arnold:'db',shrugs:'db',
+  curl:'db',hammer:'db',conc_curl:'db',preacher:'machine',incline_curl:'db',
+  tdips:'bw',pushdown:'cable',skull_crush:'db',oh_ext:'db',cg_bench:'bb',
+  plank:'bw',crunch:'bw',leg_raise:'pullbar',russian:'bw',bicycle:'bw',ab_wheel:'bw',dead_bug:'bw',
+  squat:'bb',goblet:'db',lunges:'bw',leg_press:'machine',rdl:'bb',leg_curl:'machine',calf_raise:'bw',
+  hip_thrust:'bb',glute_bridge:'bw',sumo_squat:'db',kickback:'cable',
+  running:'bw',jump_rope:'bands',cycling:'machine',rowing:'machine',hiit_sprint:'bw',jjacks:'bw',burpees:'bw',kb_swing:'kb',
+};
+
 // ── Gym equipment templates ──
 const GYM_TEMPLATES={
-  full:{label:'Full Gym',emoji:'🏋️',desc:'Commercial gym — all equipment available',
-    equipment:['Barbell + Power Rack','Full Dumbbell Set (5–100 lbs)','Cable Machine','Leg Press','Smith Machine','Pull-up Bar','Treadmill','Stationary Bike','Rowing Machine','Kettlebells','Resistance Bands','Flat + Incline Bench']},
-  apartment:{label:'Apartment Gym',emoji:'🏢',desc:'Building gym — limited but workable',
-    equipment:['Dumbbells (15–50 lbs)','Treadmill or Elliptical','Stationary Bike','Pull-up Bar','Resistance Bands','Adjustable Bench (maybe)']},
-  home:{label:'Home Gym',emoji:'🏠',desc:'Personal setup at home',
+  full:{label:'Full Gym',emoji:'🏋️',desc:'Commercial gym — everything available',
+    eq:['bw','db','bb','cable','machine','pullbar','kb','bench','bands'],
+    equipment:['Barbell + Power Rack','Dumbbells (5–100+ lbs)','Cable Machine','Lat Pulldown','Leg Press','Leg Extension','Leg Curl','Smith Machine','Pull-up Bar','Treadmill','Stationary Bike','Rowing Machine','Kettlebells','Resistance Bands','Flat + Incline Bench']},
+  apartment:{label:'Apartment Gym',emoji:'🏢',desc:'Building gym — weights up to 150–180 lbs, cables & machines',
+    eq:['bw','db','bb','cable','machine','pullbar','bench'],
+    equipment:['Barbell + Squat Rack','Dumbbells (up to 150–180 lbs)','Cable Machine','Lat Pulldown','Cable Flies','Leg Press','Leg Extension','Leg Curl','Bench (flat + incline)','Pull-up Bar','Treadmill','Stationary Bike']},
+  home:{label:'Home Gym',emoji:'🏠',desc:'Personal setup — dumbbells, pull-up bar, basics',
+    eq:['bw','db','pullbar','bench','kb','bands'],
     equipment:['Dumbbells','Pull-up Bar','Adjustable Bench','Resistance Bands','Kettlebell']},
-  none:{label:'No Equipment',emoji:'🤸',desc:'Bodyweight training anywhere',
+  calisthenics:{label:'Calisthenics',emoji:'🤸',desc:'Bodyweight + bands — minimal or no weights',
+    eq:['bw','pullbar','bands'],
+    equipment:['Bodyweight only','Pull-up Bar','Resistance Bands','Dip Bars (optional)','Light Dumbbells (optional)']},
+  none:{label:'No Equipment',emoji:'✊',desc:'Anywhere, anytime — zero gear needed',
+    eq:['bw'],
     equipment:['Bodyweight only','Open floor space']},
 };
 
@@ -1732,6 +1781,7 @@ let ST={
   fitGoal:null,
   fitBrowseLib:false,
   fitExpandDay:null,
+  fitExpandEx:null,
 };
 
 // ═══════════════════════════════════════════════
@@ -2225,8 +2275,23 @@ function renderFitnessView(){
 }
 
 function renderFitnessGenderPicker(){
+  const gym=S.get('gym',{type:null,equipment:[]});
+  const gymT=gym.type?GYM_TEMPLATES[gym.type]:null;
+  const gymBanner=gymT
+    ?`<div class="fit-gym-banner" onclick="setView('goals')">
+        <span style="font-size:20px">${gymT.emoji}</span>
+        <div style="flex:1"><span style="color:var(--amber);font-weight:600">${gymT.label}</span> — ${gym.equipment?.length||0} pieces of equipment tracked</div>
+        <span style="font-size:11px;color:var(--t3)">Edit in Goals →</span>
+      </div>`
+    :`<div class="fit-gym-banner" onclick="setView('goals')">
+        <span style="font-size:20px">⚙️</span>
+        <div style="flex:1"><span style="color:var(--amber);font-weight:600">Set up your gym equipment</span> — programs will filter to exercises you can actually do</div>
+        <span style="font-size:11px;color:var(--t3)">Set Up →</span>
+      </div>`;
+
   return`<div class="fit-wrap" style="animation:fadeIn .4s ease">
-    <div style="text-align:center;margin-bottom:32px">
+    ${gymBanner}
+    <div style="text-align:center;margin-bottom:28px">
       <div style="font-family:'Playfair Display',serif;font-size:30px;margin-bottom:10px">Your Fitness Journey</div>
       <div style="font-size:13px;color:var(--t2);max-width:420px;margin:0 auto;line-height:1.6">Choose your path to get a personalized workout plan, meal suggestions, and auto-generated grocery list</div>
     </div>
@@ -2279,6 +2344,8 @@ function renderGoalProgram(gender, goalId){
 
   const customReps=S.get('custom_reps',{});
   const REP_PRESETS=['3 × 8','3 × 10','3 × 12','4 × 8','4 × 10','4 × 12','5 × 5','2 × 15','3 × 15'];
+  const gym=S.get('gym',{type:null,equipment:[]});
+  const gymEq=gym.type?GYM_TEMPLATES[gym.type]?.eq||[]:null;
 
   const schedRows=prog.schedule.map(s=>{
     const isRest=s.exIds.length===0;
@@ -2299,16 +2366,19 @@ function renderGoalProgram(gender, goalId){
         const repOptions=REP_PRESETS.map(r=>`<button class="gp-rep-chip${r===currentReps?' sel':''}" onclick="setExReps('${repsKey}','${r}');event.stopPropagation()">${r}</button>`).join('');
         const durMin=parseInt(currentReps)||3;
         const estCal=Math.round(ex.calPerMin*(durMin*0.5));
-        return`<div class="gp-ex-mini">
+        const reqEq=EXERCISE_EQ[ex.id]||'bw';
+        const hasEq=!gymEq||gymEq.includes(reqEq);
+        const eqLabel={bw:'Bodyweight',db:'Dumbbells',bb:'Barbell',cable:'Cable',machine:'Machine',pullbar:'Pull-up Bar',kb:'Kettlebell',bench:'Bench',bands:'Bands'}[reqEq]||reqEq;
+        return`<div class="gp-ex-mini" style="${!hasEq&&gymEq?'opacity:.55;border-color:rgba(224,85,85,.3)':''}">
           <div class="gp-ex-mini-emoji">${ex.emoji}</div>
           <div>
-            <div class="gp-ex-mini-name">${ex.name}</div>
+            <div class="gp-ex-mini-name">${ex.name}${!hasEq&&gymEq?' <span style="font-size:10px;color:var(--red)">⚠ needs '+eqLabel+'</span>':''}</div>
             <div class="gp-ex-mini-why">💡 ${why}</div>
             <div class="gp-reps-row">
               <div class="gp-reps-lbl">Sets × Reps</div>
               ${repOptions}
             </div>
-            <div class="gp-ex-mini-cal">🔥 ~${estCal} cal · ~${ex.calPerMin} cal/min</div>
+            <div class="gp-ex-mini-cal">🔥 ~${estCal} cal · ~${ex.calPerMin} cal/min &nbsp;·&nbsp; <span class="ex-eq-tag${gymEq?(hasEq?' avail':' missing'):''}" style="display:inline;padding:1px 6px">${eqLabel}${gymEq?(hasEq?' ✓':''):''}</span></div>
           </div>
         </div>`;
       }).join('');
@@ -2418,6 +2488,9 @@ function renderGoalProgram(gender, goalId){
 function renderExerciseLibrary(){
   const filtered=ST.fitMuscle==='all'?FITNESS_EXERCISES:FITNESS_EXERCISES.filter(e=>e.group===ST.fitMuscle||e.secondary.includes(ST.fitMuscle));
   const mg=MUSCLE_GROUPS.find(m=>m.id===ST.fitMuscle)||MUSCLE_GROUPS[0];
+  const gym=S.get('gym',{type:null,equipment:[]});
+  const gymEq=gym.type?GYM_TEMPLATES[gym.type]?.eq||[]:null;
+
   const mgTiles=MUSCLE_GROUPS.map(mg=>{
     const cnt=mg.id==='all'?FITNESS_EXERCISES.length:FITNESS_EXERCISES.filter(e=>e.group===mg.id).length;
     const active=ST.fitMuscle===mg.id;
@@ -2425,53 +2498,70 @@ function renderExerciseLibrary(){
       style="border-color:${active?mg.color:'var(--border)'};${active?`background:${mg.dim};box-shadow:0 0 16px ${mg.color}30`:''}">
       <div class="mg-body">${buildBodySVG(active?mg.id:'none')}</div>
       <div class="mg-label" style="color:${active?mg.color:'var(--t2)'}">${mg.label}</div>
-      <div class="mg-count">${cnt} exercises</div>
+      <div class="mg-count">${cnt}</div>
     </div>`;
   }).join('');
-  const exCards=filtered.map(ex=>{
+
+  const exList=filtered.map(ex=>{
     const ytUrl=`https://www.youtube.com/watch?v=${ex.yt}`;
-    const ytThumb=`https://img.youtube.com/vi/${ex.yt}/mqdefault.jpg`;
-    const levelColor=ex.level==='Beginner'?'var(--green)':ex.level==='Intermediate'?'var(--amber)':'var(--red)';
-    const levelDim=ex.level==='Beginner'?'var(--gdim)':ex.level==='Intermediate'?'var(--adim)':'var(--rdim)';
     const mgr=MUSCLE_GROUPS.find(m=>m.id===ex.group)||MUSCLE_GROUPS[1];
     const secStr=ex.secondary.map(s=>MUSCLE_GROUPS.find(m=>m.id===s)?.label||s).join(', ');
-    return`<div class="ex-card">
-      <div class="ex-thumb" style="background:${ex.bg};min-height:120px" onclick="window.open('${ytUrl}','_blank')">
-        <img src="${ytThumb}" alt="${ex.name}" style="width:100%;height:100%;object-fit:cover;opacity:.85" onerror="this.style.display='none';this.nextSibling.style.display='flex'" loading="lazy">
-        <div style="display:none;width:100%;height:100%;align-items:center;justify-content:center;font-size:56px"><span>${ex.emoji}</span></div>
-        <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.7));padding:8px 10px">
-          <span style="font-size:9px;color:#fff;font-weight:700;letter-spacing:.5px">▶ WATCH TUTORIAL</span>
+    const levelColor=ex.level==='Beginner'?'var(--green)':ex.level==='Intermediate'?'var(--amber)':'var(--red)';
+    const reqEq=EXERCISE_EQ[ex.id]||'bw';
+    const hasEq=!gymEq||gymEq.includes(reqEq);
+    const eqLabel={bw:'Bodyweight',db:'Dumbbells',bb:'Barbell',cable:'Cable',machine:'Machine',pullbar:'Pull-up Bar',kb:'Kettlebell',bench:'Bench',bands:'Bands'}[reqEq]||reqEq;
+    const isOpen=ST.fitExpandEx===ex.id;
+    const why=EXERCISE_WHY[ex.id]||'';
+
+    const detailHtml=isOpen?`<div class="ex-detail">
+      <div class="ex-detail-desc">${ex.desc}</div>
+      ${why?`<div class="ex-detail-why">💡 ${why}</div>`:''}
+      <div class="ex-detail-row">
+        <span style="font-size:10px;color:var(--t3)">📋 ${ex.sets}</span>
+        <span style="font-size:10px;color:var(--red)">🔥 ~${ex.calPerMin} cal/min</span>
+        <span class="ex-eq-tag${gymEq?(hasEq?' avail':' missing'):''}">🔧 ${eqLabel}${gymEq?( hasEq?' ✓':' — you may not have this'):''}
+        </span>
+      </div>
+      <div class="ex-detail-btns">
+        <button class="ex-detail-add" onclick="addExerciseToDay('${ex.id}');event.stopPropagation()">+ Add to Today's Workout</button>
+        <a href="${ytUrl}" target="_blank" class="ex-detail-yt" onclick="event.stopPropagation()">▶ Watch Tutorial</a>
+      </div>
+    </div>`:'';
+
+    return`<div class="ex-row${!hasEq&&gymEq?' no-eq':''}">
+      <div class="ex-row-hdr" onclick="toggleExExpand('${ex.id}')">
+        <div class="ex-row-emoji">${ex.emoji}</div>
+        <div>
+          <div class="ex-row-name">${ex.name}${!hasEq&&gymEq?' ⚠️':''}</div>
+          <div class="ex-row-meta">
+            <span style="font-weight:700;color:${mgr.color}">${mgr.label}</span>
+            ${secStr?`<span>+ ${secStr}</span>`:''}
+            <span style="color:${levelColor}">${ex.level}</span>
+          </div>
+        </div>
+        <div class="ex-row-right">
+          <span class="ex-row-cal">🔥 ${ex.calPerMin}/min</span>
+          <span class="ex-row-chevron${isOpen?' open':''}">▶</span>
         </div>
       </div>
-      <div class="ex-body">
-        <div class="ex-name">${ex.name}</div>
-        <div class="ex-badges">
-          <span class="ex-badge" style="background:${mgr.dim};color:${mgr.color}">🎯 ${mgr.label}</span>
-          ${secStr?`<span class="ex-badge" style="background:var(--surface);color:var(--t2)">+ ${secStr}</span>`:''}
-          <span class="ex-badge" style="background:${levelDim};color:${levelColor}">${ex.level}</span>
-          <span class="ex-badge" style="background:var(--rdim);color:var(--red)">🔥 ~${ex.calPerMin} cal/min</span>
-        </div>
-        <div class="ex-desc">${ex.desc}</div>
-        <div style="font-size:10px;color:var(--t3);margin-bottom:10px">📋 ${ex.sets}</div>
-        <div class="ex-actions">
-          <button class="ex-add" onclick="addExerciseToDay('${ex.id}')">+ Add to Today</button>
-          <a href="${ytUrl}" target="_blank" class="ex-yt">▶ YouTube</a>
-        </div>
-      </div>
+      ${detailHtml}
     </div>`;
   }).join('');
+
+  const gymT=gym.type?GYM_TEMPLATES[gym.type]:null;
+  const gymNote=gymT
+    ?`<div style="font-size:11px;color:var(--t3);margin-bottom:12px">${gymT.emoji} Filtered for <strong style="color:var(--amber)">${gymT.label}</strong> — ⚠️ = needs equipment you may not have · <button onclick="setView('goals')" style="background:none;border:none;color:var(--amber);cursor:pointer;font-size:11px;padding:0;font-family:'DM Sans',sans-serif">Change gym →</button></div>`
+    :`<div style="font-size:11px;color:var(--t3);margin-bottom:12px"><button onclick="setView('goals')" style="background:none;border:none;color:var(--amber);cursor:pointer;font-size:11px;padding:0;font-family:'DM Sans',sans-serif">⚙️ Set up your gym in Goals tab to see equipment availability →</button></div>`;
+
   return`<div class="fit-wrap" style="animation:fadeIn .3s ease">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap">
       <button class="btn" onclick="backFromLibrary()">← Back</button>
       <div style="font-family:'Playfair Display',serif;font-size:22px">💪 Exercise Library</div>
+      <span style="font-size:12px;color:var(--t3);margin-left:4px">${filtered.length} exercises</span>
     </div>
-    <div class="mg-grid">${mgTiles}</div>
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-      <div style="font-family:'Playfair Display',serif;font-size:17px">${mg.id==='all'?'All Exercises':`${mg.emoji} ${mg.label} Exercises`}
-        <span style="font-size:12px;color:var(--t3);font-family:'DM Sans',sans-serif;margin-left:8px">${filtered.length} exercises</span>
-      </div>
-    </div>
-    ${filtered.length?`<div class="ex-grid">${exCards}</div>`:`<div style="text-align:center;padding:50px 0;color:var(--t3)">
+    <div class="mg-grid" style="margin-bottom:16px">${mgTiles}</div>
+    ${gymNote}
+    ${filtered.length?`<div class="ex-list">${exList}</div>`:`<div style="text-align:center;padding:50px 0;color:var(--t3)">
       <div style="font-size:40px;margin-bottom:12px">${mg.emoji}</div>
       <div style="font-family:'Playfair Display',serif;font-size:18px;color:var(--t2);margin-bottom:6px">No exercises found</div>
       <div style="font-size:12px">Try a different muscle group</div>
@@ -2485,6 +2575,7 @@ function showExerciseLibrary(){ST.fitBrowseLib=true;render();}
 function backFromLibrary(){ST.fitBrowseLib=false;render();}
 function selectMuscle(id){ST.fitMuscle=id;render();}
 function toggleDayExpand(day){ST.fitExpandDay=ST.fitExpandDay===day?null:day;render();}
+function toggleExExpand(id){ST.fitExpandEx=ST.fitExpandEx===id?null:id;render();}
 function setExReps(key,val){const r=S.get('custom_reps',{});r[key]=val;S.set('custom_reps',r);render();}
 
 function applyProgramToWeek(gender, goalId){
@@ -2690,7 +2781,7 @@ function renderGoalsView(){
   const gymCard=`<div class="goals-card" style="margin-top:18px">
     <div class="goals-title">🏋️ Your Gym Setup</div>
     <div style="font-size:12px;color:var(--t2);margin-bottom:4px">What kind of gym do you have? We'll tailor workout recommendations to your equipment.</div>
-    <div class="gym-type-grid">${gymTypeCards}</div>
+    <div class="gym-type-grid" style="grid-template-columns:repeat(5,1fr)">${gymTypeCards}</div>
     ${gymType?`<div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Your Equipment</div>
     <div class="gym-equip-list">${equipChips||'<span style="font-size:11px;color:var(--t3)">No equipment listed yet</span>'}</div>
     <div class="gym-add-row">
