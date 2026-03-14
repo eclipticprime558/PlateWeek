@@ -530,6 +530,16 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 /* ─── FITNESS GYM BANNER ─── */
 .fit-gym-banner{background:var(--adim);border:1px solid rgba(232,160,48,.25);border-radius:10px;padding:10px 14px;margin-bottom:18px;display:flex;align-items:center;gap:10px;font-size:12px;cursor:pointer;transition:border-color .15s}
 .fit-gym-banner:hover{border-color:var(--amber)}
+
+/* ─── EXERCISE STEPS CARD ─── */
+.ex-steps{background:rgba(232,160,48,.04);border:1px solid rgba(232,160,48,.15);border-radius:10px;padding:12px 14px;margin-bottom:12px}
+.ex-steps-title{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:2px;color:var(--amber);margin-bottom:10px}
+.ex-step{display:flex;gap:10px;margin-bottom:8px;align-items:flex-start}
+.ex-step:last-child{margin-bottom:0}
+.ex-step-num{width:20px;height:20px;min-width:20px;border-radius:50%;background:var(--amber);color:#000;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.ex-step-num.tip{background:var(--adim);color:var(--amber);font-size:12px}
+.ex-step-text{font-size:12px;color:var(--text);line-height:1.5}
+.ex-step-tip{font-size:11px;color:var(--amber);line-height:1.5;font-style:italic}
 </style>
 </head>
 <body>
@@ -977,6 +987,63 @@ const EXERCISE_WHY={
   dead_bug:'Anti-rotation core stability. Protects lumbar spine while training deep stabilizer muscles.',
   ab_wheel:'One of the hardest core exercises. Full anti-extension through trunk, shoulders, and lats.',
   hiit_bike:'Bike sprints spare the joints while hitting HIIT intensity. Zero impact, maximum calorie burn.',
+};
+
+// ── Step-by-step instructions for each exercise ──
+const EXERCISE_STEPS={
+  pushup:['🏁 Start in plank — hands shoulder-width apart, body straight head to heel','⬇️ Lower chest toward floor, elbows at 45° angle from body','⬆️ Push back to full arm extension, squeeze chest at top','💡 Keep core tight the whole time — no sagging hips or piking up'],
+  bench:['🏁 Lie on bench, grip bar slightly wider than shoulders, eyes under bar','⬇️ Lower bar to mid-chest in 2 seconds with control, slight arch','⬆️ Press bar up explosively to full lockout','💡 Feet flat, shoulder blades pinched together, wrists straight'],
+  incline:['🏁 Set bench 30–45°, grip bar, eyes under bar, lie back','⬇️ Lower bar to upper chest/collarbone area with control','⬆️ Press up explosively — don\'t fully lock out to keep tension','💡 Steeper angle = more shoulder. 30–35° is the sweet spot for upper chest'],
+  dbell_fly:['🏁 Lie flat, hold dumbbells above chest, palms facing each other, slight elbow bend','⬇️ Open arms out in a wide arc until you feel a deep chest stretch at the bottom','⬆️ Bring dumbbells back together in the same arc, squeeze chest at top','💡 Think "hugging a barrel" — arc motion, not a press. No straightening the arms.'],
+  cable_fly:['🏁 Cables at highest setting, grab handles, step forward in a split stance','➡️ Bring hands together in front of chest in a wide sweeping arc','🔒 Hold squeeze for 1 second at peak, controlled return','💡 Keep slight forward lean and soft elbow bend throughout the entire rep'],
+  chest_dips:['🏁 Grip parallel bars, lean torso forward 20–30°, arms straight','⬇️ Lower until upper arms are parallel to floor — feel the chest stretch','⬆️ Press back up through palms, focus on chest not triceps','💡 Leaning forward = chest. Staying upright = triceps. Control the descent.'],
+  pullup:['🏁 Hang from bar, palms facing away, arms fully extended, shoulders relaxed','⬆️ Pull chin above the bar, drive elbows DOWN toward your hips','⬇️ Lower back to full hang slowly over 2–3 seconds','💡 No kipping or swinging. Slow reps = 3× the muscle growth of fast reps.'],
+  chinup:['🏁 Hang from bar, palms facing YOU, shoulder-width grip, arms extended','⬆️ Pull yourself up until chin clears bar, biceps fully squeezed','⬇️ Lower slowly to full hang — the descent is where growth happens','💡 Slightly easier than pull-ups because biceps contribute more. Great starting point.'],
+  lat_pull:['🏁 Sit at machine, thighs under pads, wide overhand grip on bar','⬇️ Pull bar to upper chest, lean back slightly, drive elbows down','↩️ Return with control to full arm extension — feel the lat stretch','💡 Feel LATS not biceps. Imagine pulling your elbows to your back pockets.'],
+  bent_row:['🏁 Hinge at hips, back flat at ~45°, hold barbell with overhand grip','⬆️ Pull bar to lower chest/belly — drive elbows straight back behind you','⬇️ Lower bar back down with full control','💡 Squeeze shoulder blades together at top. Back stays flat — no rounding.'],
+  deadlift:['🏁 Bar over mid-foot, hips hinge back, grip just outside legs, flat back, deep breath','⬆️ Push the floor away with your legs, bar stays close to shins and thighs','🔒 Lock out at top — hips forward, stand tall, hard glute squeeze','💡 This is a HIP HINGE not a squat. Hips shoot back, not down. Bar stays on your body.'],
+  seated_row:['🏁 Sit tall, feet on platform, grab handle, arms extended with slight forward lean','⬆️ Pull handle to midsection, squeeze shoulder blades firmly together','⬇️ Reach arms forward for full stretch, then immediately pull again','💡 Don\'t lean back excessively — use your back muscles, not momentum.'],
+  ohp:['🏁 Bar at shoulder height, grip just outside shoulders, brace core hard like a punch is coming','⬆️ Press bar straight overhead to lockout, head moves slightly forward to allow clearance','⬇️ Lower bar back to shoulders with control','💡 No leg drive. Strict press only. Abs braced throughout. Wrists straight over elbows.'],
+  lat_raise:['🏁 Stand holding dumbbells at sides, slight bend at elbows, slight forward lean','↔️ Raise both arms out to sides to shoulder height — lead with elbows, not hands','⬇️ Lower slowly back to sides over 2 seconds','💡 Pinky finger slightly higher than thumb activates more side delt. Don\'t swing.'],
+  face_pull:['🏁 Cable at forehead height, rope attachment, step back, arms extended','⬅️ Pull rope toward face — elbows flare OUT and HIGH, hands pull past your ears','↩️ Extend arms slowly back to start','💡 Elbows must be ABOVE shoulder height at peak. This protects your rotator cuff.'],
+  arnold:['🏁 Hold dumbbells at chin height, palms facing YOU','⬆️ Press up while rotating wrists outward so palms face AWAY at the top','⬇️ Lower and rotate palms back toward you in the same motion','💡 Slow the rotation to feel all 3 deltoid heads activate. Named after Arnold for a reason.'],
+  shrugs:['🏁 Hold heavy dumbbells at sides, arms straight, stand tall','⬆️ Shrug shoulders straight UP as high as possible toward ears','⏸️ Hold for 1 full second at the top','💡 Straight up and down only — no rolling. Heavy as possible with good form.'],
+  curl:['🏁 Stand with dumbbells, arms straight at sides, palms forward','⬆️ Curl both weights up, squeeze biceps hard at the top','⬇️ Lower SLOWLY over 3 seconds — the negative builds more muscle than the lift','💡 Elbows stay pinned at your sides. No swinging or leaning back.'],
+  hammer:['🏁 Hold dumbbells with neutral grip (thumbs pointing up), arms at sides','⬆️ Curl up keeping thumbs pointing up the entire time','⬇️ Lower with control, full extension at the bottom','💡 Hits the brachialis under the bicep — makes arms look thicker from all angles.'],
+  conc_curl:['🏁 Sit, spread legs, rest elbow on inner thigh, arm fully extended holding dumbbell','⬆️ Curl the weight up focusing on bicep contraction — don\'t swing shoulder','🔒 Squeeze hard at the top for 1 second','💡 No swinging possible here. Perfect position for building the bicep peak.'],
+  preacher:['🏁 Sit at preacher bench, upper arms resting on angled pad, arms extended','⬆️ Curl bar up in a smooth arc to full contraction','⬇️ Lower slowly until arms are almost fully extended — stop before lockout','💡 The stretch at the bottom is where growth happens. Never drop the weight fast.'],
+  incline_curl:['🏁 Set bench to 60° incline, lean back, let arms hang straight down behind you','⬆️ Curl both dumbbells up from the hanging position','⬇️ Lower back down to full hang slowly, feel the stretch','💡 The stretch on the long head in this position is unmatched for building peak height.'],
+  tdips:['🏁 Grip parallel bars, body upright (not leaning), arms straight','⬇️ Lower until upper arms are parallel to floor','⬆️ Press back up to full arm extension — feel the triceps squeeze','💡 Body UPRIGHT = triceps. Leaning forward = chest. Keep it vertical for arms.'],
+  pushdown:['🏁 Stand at cable, elbows pinned to sides at chest height, grab rope or bar','⬇️ Push down to full extension, hard tricep squeeze at the bottom','↩️ Let cable pull hands back up slowly — elbows stay at your sides','💡 If elbows flare out you\'re cheating. Tight elbows = all triceps.'],
+  skull_crush:['🏁 Lie on bench, hold EZ-bar or dumbbells above forehead, arms extended to ceiling','⬇️ Lower weight toward forehead by ONLY bending elbows — shoulders stay fixed','⬆️ Extend back up to start, elbows stationary and pointing up throughout','💡 Elbows point at the ceiling the whole time. Flaring = bench press, not skull crushers.'],
+  oh_ext:['🏁 Stand or sit, hold one dumbbell overhead with both hands, arms extended','⬇️ Lower dumbbell behind your head by bending ONLY at the elbows','⬆️ Press back up to full extension overhead','💡 Keep elbows close to your head. Overhead position gives maximum long-head stretch.'],
+  cg_bench:['🏁 Lie on bench, place hands shoulder-width apart on bar (narrower than regular bench)','⬇️ Lower bar to lower chest — elbows track back, not flaring out to sides','⬆️ Press up explosively to full lockout, feel triceps squeeze','💡 Don\'t go too narrow or it stresses your wrists. Shoulder-width is perfect.'],
+  plank:['🏁 Forearms on floor, body completely straight from head to heel','🔒 Brace core like you\'re bracing for a punch to the stomach','🌬️ Breathe normally while holding — don\'t hold your breath','💡 Hips sagging or piking = form break. Drop to knees to keep it perfect.'],
+  crunch:['🏁 Lie on back, knees bent, feet flat, hands lightly behind head','⬆️ Curl ONLY your shoulder blades off the floor — not a full sit-up','⬇️ Lower with control, don\'t fully relax at the bottom','💡 Exhale on the way up. Hands are a guide only — don\'t pull on your neck.'],
+  leg_raise:['🏁 Hang from pull-up bar, arms fully extended, legs together and straight','⬆️ Raise straight legs up to 90° or higher','⬇️ Lower legs slowly over 3 full seconds — fight gravity on the way down','💡 No swinging. Floor version (lying leg raise) is a valid modification.'],
+  russian:['🏁 Sit on floor, lean back 45°, feet elevated, hold weight at chest','🔄 Rotate torso to touch weight to floor on your left side','🔄 Rotate to the right side — that\'s 1 rep each side','💡 Feet higher = harder. Add a dumbbell or plate to progress.'],
+  bicycle:['🏁 Lie on back, legs raised, hands behind head, lower back pressed into floor','🔄 Bring right elbow toward left knee, extend right leg out straight','🔄 Switch sides — left elbow to right knee — that\'s 1 rep','💡 Slow and controlled beats fast and sloppy. Feel each oblique rotation fully.'],
+  ab_wheel:['🏁 Kneel on floor, hold ab wheel with both hands directly below shoulders','⬇️ Roll forward slowly, extending hips and body toward the floor','⬆️ Pull back using ONLY your core — not arms or hip flexors','💡 Start with small rolls. Full extension is advanced. Stop if lower back arches.'],
+  dead_bug:['🏁 Lie on back, arms straight up to ceiling, knees at 90° in the air','⬇️ Simultaneously lower opposite arm and leg toward the floor slowly','↩️ Return to start before switching sides','💡 Lower back MUST stay pressed to the floor the entire time. That\'s the whole point.'],
+  squat:['🏁 Bar on upper traps, feet shoulder-width, toes slightly out, brace core','⬇️ Sit back and down until hips reach at least parallel with knees','⬆️ Drive through full foot, push knees out, stand tall','💡 Knees track over toes. No caving inward. Chest up throughout.'],
+  goblet:['🏁 Hold dumbbell vertically at chest, feet slightly wider than shoulders, toes out','⬇️ Squat down deep — elbows come inside knees at the bottom','⬆️ Drive back up through full foot, stand tall','💡 The weight out front forces perfect form — upright torso, deep squat, knees out.'],
+  lunges:['🏁 Stand tall, step one foot forward into a long stride','⬇️ Lower back knee toward floor — front shin stays vertical, not past toes','⬆️ Push through front heel to stand, bring feet together','💡 Keep torso upright. Don\'t let knee cave in. Front knee stays over ankle.'],
+  leg_press:['🏁 Sit in machine, feet on platform — high & wide (glutes) or low & narrow (quads)','⬇️ Lower weight until knees reach 90° — don\'t let lower back lift off seat','⬆️ Push through full foot to near-lockout — don\'t lock knees at top','💡 High/wide feet hits more glutes. Low/narrow hits more quads. Experiment with both.'],
+  rdl:['🏁 Stand holding bar at hips, soft bend in knees, shoulders back and down','⬇️ Hinge at hips — push them BACK, bar slides down your legs close to body','🔒 Stop when you feel a deep hamstring stretch or back would round','⬆️ Drive hips forward and stand, squeeze glutes hard at top','💡 It\'s a hinge not a squat. Bar stays dragging on your legs the whole way down.'],
+  leg_curl:['🏁 Lie face down on machine, pad just above heel, hips pressed down','⬆️ Curl heels toward glutes in a smooth arc — squeeze hamstrings hard at top','🔒 Hold at the top for 1 second','⬇️ Lower with control over 2–3 seconds — don\'t drop the weight','💡 The slow lowering phase builds more hamstring than the actual curl. Take your time.'],
+  calf_raise:['🏁 Stand on step edge, balls of feet on edge, heels hanging off','⬆️ Rise onto toes as high as possible — full squeeze at top','⬇️ Lower heels BELOW step level for a full Achilles stretch, 3 seconds down','💡 Full range = bottom stretch is as important as the top squeeze for calf growth.'],
+  hip_thrust:['🏁 Upper back on bench edge, barbell on hips with pad, feet flat hip-width, knees bent','⬆️ Drive hips straight UP until body is a straight line shoulder to knee','🔒 HARD glute squeeze at the top for 1–2 seconds — this is the whole exercise','⬇️ Lower hips toward floor slowly, stop just before touching','💡 Full hip extension + hard squeeze at top is what builds the booty. Don\'t rush it.'],
+  glute_bridge:['🏁 Lie on back, knees bent, feet flat on floor hip-width, arms at sides','⬆️ Drive hips up by squeezing glutes — not your lower back','🔒 Hold at the top for 2 seconds, hard glute squeeze','⬇️ Lower slowly back to floor','💡 Feet closer to your body = more glute activation. Add weight on hips to progress.'],
+  sumo_squat:['🏁 Feet wider than shoulders, toes pointed out at 45° angle','⬇️ Squat straight down between your legs, keep chest up, knees push OUT','🔒 Feel inner thighs and glutes stretch at the bottom','⬆️ Drive through heels to stand, squeeze glutes at top','💡 Don\'t let knees cave in. Wider stance shifts work to inner thighs and glutes.'],
+  kickback:['🏁 Attach ankle strap to cable, face the machine, hold support, slight forward lean','⬆️ Kick leg straight back and slightly upward, squeezing glute at peak contraction','⬇️ Return leg controlled to start — don\'t swing or use momentum','💡 The forward lean improves glute activation. The squeeze at the top is the whole point.'],
+  running:['🏁 Upright posture, shoulders relaxed, arms swinging front-to-back (not across body)','➡️ Land midfoot — not heel. Foot lands under your hips, not in front','⚡ For fat burning: 20–30 min steady. For HIIT: 1 min hard / 1 min easy','💡 Midfoot landing reduces joint impact significantly. Shorten stride, increase cadence for speed.'],
+  jump_rope:['🏁 Hold handles at hip height, rope behind you, stand on balls of feet','⚡ Turn wrists in small circles, jump only 1–2 inches high to clear rope','🔄 Land softly on balls of feet, knees slightly bent every landing','💡 Start with singles (1 jump per rope rotation). Elbows stay close to ribs throughout.'],
+  cycling:['🏁 Adjust seat so knee has 5–10° bend at the bottom of the pedal stroke','🔄 Push through the full pedal circle — think scraping mud off at the bottom','⚡ For HIIT: 30 seconds maximum effort, 30 seconds easy recovery','💡 Pedaling in full circles (not just pushing down) generates 30% more power output.'],
+  rowing:['🏁 Sit tall, feet strapped in, grab handle, arms extended, slight forward lean','🦵 Drive with LEGS first, then lean back, then pull arms to lower chest — in that order','➡️ Reverse sequence: arms extend, then lean forward, then compress legs','💡 60% legs, 20% back lean, 20% arms. Most people over-use their arms.'],
+  hiit_sprint:['🏁 Find treadmill or open space, set timer for 20 seconds on / 10 seconds off','⚡ SPRINT at 90–100% max effort for the full 20 seconds — no holding back','😮‍💨 Rest completely for 10 seconds, then go again — 8 rounds total = 4 minutes','💡 The afterburn effect raises your metabolism for up to 48 hours post-workout.'],
+  jjacks:['🏁 Stand with feet together, arms at sides','⚡ Jump feet apart while raising arms overhead simultaneously','⬇️ Jump feet back together and lower arms — that\'s 1 rep','💡 Low-impact option: step side to side instead of jumping. Same benefit, less joint stress.'],
+  burpees:['🏁 Stand tall, arms at sides','⬇️ Squat down, hands to floor, jump or step feet back to plank position','⬇️ Do a push-up, then jump or step feet forward to hands','⬆️ Explode up into a jump, arms overhead — land softly','💡 Modify by stepping back instead of jumping. Add push-up for full version.'],
+  kb_swing:['🏁 Stand with kettlebell on floor between feet, hinge at hips, grab with both hands','⬆️ Hike KB back between legs (like a hiking snap), then SNAP hips forward explosively','🔒 Let KB float up to shoulder height from hip power — arms just guide it','💡 This is a HIP HINGE power move, not a squat or shoulder raise. Hips do ALL the work.'],
 };
 
 // ── Equipment required per exercise (bw=bodyweight, db=dumbbells, bb=barbell, cable=cable, machine=machine, pullbar, kb=kettlebell, bench, bands) ──
@@ -2554,8 +2621,7 @@ function renderGoalProgram(gender, goalId){
 }
 
 // ─ Helper: render one exercise row ─
-function buildExRow(ex, gymEq){
-  const ytUrl=`https://www.youtube.com/watch?v=${ex.yt}`;
+function buildExRow(ex, gymEq, libGender){
   const mgr=MUSCLE_GROUPS.find(m=>m.id===ex.group)||MUSCLE_GROUPS[1];
   const secStr=ex.secondary.map(s=>MUSCLE_GROUPS.find(m=>m.id===s)?.label||s).join(', ');
   const levelColor=ex.level==='Beginner'?'var(--green)':ex.level==='Intermediate'?'var(--amber)':'var(--red)';
@@ -2565,8 +2631,28 @@ function buildExRow(ex, gymEq){
   const eqLabel=EQ_LABEL[reqEq]||reqEq;
   const isOpen=ST.fitExpandEx===ex.id;
   const why=EXERCISE_WHY[ex.id]||'';
+
+  // Gender-aware YouTube search link
+  const ytQuery=libGender==='female'
+    ?encodeURIComponent(`women how to ${ex.name} exercise tutorial`)
+    :encodeURIComponent(`how to ${ex.name} proper form technique`);
+  const ytUrl=`https://www.youtube.com/results?search_query=${ytQuery}`;
+  const ytLabel=libGender==='female'?'▶ Women\'s Tutorial':'▶ Watch Tutorial';
+
+  // Step-by-step instructions card
+  const steps=EXERCISE_STEPS[ex.id]||null;
+  const stepsHtml=steps?`<div class="ex-steps">
+    <div class="ex-steps-title">📋 Step-by-Step Instructions</div>
+    ${steps.map((s,i)=>{
+      const isTip=s.startsWith('💡');
+      return isTip
+        ?`<div class="ex-step"><div class="ex-step-num tip">💡</div><div class="ex-step-tip">${s.slice(2).trim()}</div></div>`
+        :`<div class="ex-step"><div class="ex-step-num">${i+1}</div><div class="ex-step-text">${s}</div></div>`;
+    }).join('')}
+  </div>`:`<div class="ex-detail-desc">${ex.desc}</div>`;
+
   const detailHtml=isOpen?`<div class="ex-detail">
-    <div class="ex-detail-desc">${ex.desc}</div>
+    ${stepsHtml}
     ${why?`<div class="ex-detail-why">💡 ${why}</div>`:''}
     <div class="ex-detail-row">
       <span style="font-size:10px;color:var(--t3)">📋 ${ex.sets}</span>
@@ -2575,9 +2661,10 @@ function buildExRow(ex, gymEq){
     </div>
     <div class="ex-detail-btns">
       <button class="ex-detail-add" onclick="addExerciseToDay('${ex.id}');event.stopPropagation()">+ Add to Today</button>
-      <a href="${ytUrl}" target="_blank" class="ex-detail-yt" onclick="event.stopPropagation()">▶ Watch Tutorial</a>
+      <a href="${ytUrl}" target="_blank" class="ex-detail-yt" onclick="event.stopPropagation()">${ytLabel}</a>
     </div>
   </div>`:'';
+
   return`<div class="ex-row${!hasEq&&gymEq?' no-eq':''}">
     <div class="ex-row-hdr" onclick="toggleExExpand('${ex.id}')">
       <div class="ex-row-emoji">${ex.emoji}</div>
@@ -2651,7 +2738,7 @@ function renderExerciseLibrary(){
   catsToShow.forEach(cat=>{
     const exs=cat.ids.map(id=>FITNESS_EXERCISES.find(e=>e.id===id)).filter(Boolean);
     if(!exs.length)return;
-    const rows=exs.map(ex=>buildExRow(ex,gymEq)).join('');
+    const rows=exs.map(ex=>buildExRow(ex,gymEq,ST.fitLibGender)).join('');
     sectionsHtml+=`
       <div class="cat-section-hdr">
         <span style="font-size:24px">${cat.emoji}</span>
