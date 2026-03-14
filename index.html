@@ -2,8 +2,19 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>PlateWeek — Meal & Workout Planner</title>
+<meta name="description" content="Personalized meal planner, calorie tracker & fitness app">
+<!-- PWA / App install -->
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="apple-touch-icon" href="icon.svg">
+<meta name="theme-color" content="#E8A030">
+<!-- iOS PWA -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PlateWeek">
+<meta name="mobile-web-app-capable" content="yes">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -530,6 +541,43 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 /* ─── FITNESS GYM BANNER ─── */
 .fit-gym-banner{background:var(--adim);border:1px solid rgba(232,160,48,.25);border-radius:10px;padding:10px 14px;margin-bottom:18px;display:flex;align-items:center;gap:10px;font-size:12px;cursor:pointer;transition:border-color .15s}
 .fit-gym-banner:hover{border-color:var(--amber)}
+
+/* ─── SAFE AREA / PWA ─── */
+body{padding-top:env(safe-area-inset-top)}
+.hdr{padding-top:calc(13px + env(safe-area-inset-top));top:env(safe-area-inset-top)}
+
+/* ─── BOTTOM NAV (mobile + app mode) ─── */
+.bnav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);flex-direction:row;justify-content:space-around;align-items:stretch;padding-bottom:env(safe-area-inset-bottom);z-index:200;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.bnav-btn{flex:1;background:none;border:none;cursor:pointer;padding:8px 2px 6px;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--t3);font-family:'DM Sans',sans-serif;transition:color .15s;-webkit-tap-highlight-color:transparent}
+.bnav-btn.active{color:var(--amber)}
+.bnav-icon{font-size:21px;line-height:1;display:block}
+.bnav-lbl{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;display:block}
+.bnav-dot{width:5px;height:5px;background:var(--amber);border-radius:50%;margin:1px auto 0;display:none}
+.bnav-btn.active .bnav-dot{display:block}
+
+/* Show bottom nav on mobile screens */
+@media(max-width:680px){
+  .bnav{display:flex}
+  .nav-tabs{display:none}
+  .hdr-right .btn{display:none}
+  #app{padding-bottom:calc(62px + env(safe-area-inset-bottom))}
+}
+/* Show bottom nav in standalone/installed app mode (all screen sizes) */
+@media(display-mode:standalone){
+  .bnav{display:flex}
+  .nav-tabs{display:none}
+  .hdr-right .btn{display:none}
+  #app{padding-bottom:calc(62px + env(safe-area-inset-bottom))}
+}
+/* iOS standalone via JS class */
+body.pwa-mode .bnav{display:flex}
+body.pwa-mode .nav-tabs{display:none}
+body.pwa-mode .hdr-right .btn{display:none}
+body.pwa-mode #app{padding-bottom:calc(62px + env(safe-area-inset-bottom))}
+
+/* ─── INSTALL BANNER ─── */
+.install-banner{display:none;position:fixed;bottom:0;left:0;right:0;background:linear-gradient(90deg,var(--adim),#1E1A10);border-top:1px solid var(--amber);padding:12px 16px;padding-bottom:calc(12px + env(safe-area-inset-bottom));z-index:300;align-items:center;gap:10px;font-size:12px;animation:slideDown .3s ease}
+.install-banner.show{display:flex}
 
 /* ─── EXERCISE STEPS CARD ─── */
 .ex-steps{background:rgba(232,160,48,.04);border:1px solid rgba(232,160,48,.15);border-radius:10px;padding:12px 14px;margin-bottom:12px}
@@ -3101,7 +3149,7 @@ function selAllDays(){ST.grocerySelDays=null;render();}
 // ═══════════════════════════════════════════════
 //  MEAL / WORKOUT ACTIONS
 // ═══════════════════════════════════════════════
-function setView(v){ST.view=v;render();}
+function setView(v){ST.view=v;render();updateBnav(v);}
 function shiftWeek(d){ST.weekOffset+=d;render();}
 function switchToDay(i){ST.activeDayIdx=i;ST.view='day';render();}
 function setActiveDay(i){ST.activeDayIdx=i;render();}
@@ -3512,6 +3560,74 @@ NotifMgr.init();
 Voice.init(); // Start listening immediately
 render();
 setInterval(()=>renderMealTimeInd(),60000);
+
+// ── PWA / Service Worker ──
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('./sw.js',{scope:'./'}).catch(()=>{});
+  });
+}
+
+// ── Detect standalone / installed app mode ──
+function detectPwaMode(){
+  const isStandalone=window.navigator.standalone===true||window.matchMedia('(display-mode:standalone)').matches;
+  if(isStandalone){document.body.classList.add('pwa-mode');}
+}
+detectPwaMode();
+window.matchMedia('(display-mode:standalone)').addEventListener('change',detectPwaMode);
+
+// ── Install prompt (Android/Chrome) ──
+let _deferredInstall=null;
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();_deferredInstall=e;
+  const banner=document.getElementById('install-banner');
+  if(banner&&!sessionStorage.getItem('pw-install-dismissed'))banner.classList.add('show');
+});
+function promptInstall(){
+  if(_deferredInstall){_deferredInstall.prompt();_deferredInstall=null;}
+  dismissInstallBanner();
+}
+function dismissInstallBanner(){
+  sessionStorage.setItem('pw-install-dismissed','1');
+  const b=document.getElementById('install-banner');if(b)b.classList.remove('show');
+}
+
+// ── Bottom nav active state ──
+function updateBnav(v){
+  document.querySelectorAll('.bnav-btn').forEach(btn=>{
+    btn.classList.toggle('active',btn.dataset.view===v);
+  });
+}
 </script>
+
+<!-- ── Bottom Navigation (mobile + app) ── -->
+<nav class="bnav" id="bottom-nav" role="navigation" aria-label="Main navigation">
+  <button class="bnav-btn active" data-view="week" onclick="setView('week')">
+    <span class="bnav-icon">📅</span><span class="bnav-lbl">Home</span><span class="bnav-dot"></span>
+  </button>
+  <button class="bnav-btn" data-view="fitness" onclick="setView('fitness')">
+    <span class="bnav-icon">💪</span><span class="bnav-lbl">Fitness</span><span class="bnav-dot"></span>
+  </button>
+  <button class="bnav-btn" data-view="grocery" onclick="setView('grocery')">
+    <span class="bnav-icon">🛒</span><span class="bnav-lbl">Grocery</span><span class="bnav-dot"></span>
+  </button>
+  <button class="bnav-btn" data-view="history" onclick="setView('history')">
+    <span class="bnav-icon">📋</span><span class="bnav-lbl">Log</span><span class="bnav-dot"></span>
+  </button>
+  <button class="bnav-btn" data-view="goals" onclick="setView('goals')">
+    <span class="bnav-icon">🎯</span><span class="bnav-lbl">Goals</span><span class="bnav-dot"></span>
+  </button>
+</nav>
+
+<!-- ── Install Banner (Android/Chrome) ── -->
+<div class="install-banner" id="install-banner">
+  <span style="font-size:20px">📲</span>
+  <div style="flex:1">
+    <div style="font-weight:700;color:var(--amber)">Install PlateWeek</div>
+    <div style="font-size:11px;color:var(--t2)">Add to your home screen for the full app experience</div>
+  </div>
+  <button onclick="promptInstall()" class="btn btn-amber" style="white-space:nowrap;font-size:11px">Install</button>
+  <button onclick="dismissInstallBanner()" style="background:none;border:none;color:var(--t3);cursor:pointer;font-size:16px;padding:4px">✕</button>
+</div>
 </body>
 </html>

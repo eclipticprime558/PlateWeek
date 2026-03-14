@@ -1,0 +1,43 @@
+{
+  "name": "PlateWeek",
+  "short_name": "PlateWeek",
+  "description": "Meal planner, calorie tracker & personalized fitness app",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0F0E0C",
+  "theme_color": "#E8A030",
+  "orientation": "portrait-primary",
+  "lang": "en",
+  "categories": ["food", "health", "fitness", "lifestyle"],
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Fitness",
+      "short_name": "Fitness",
+      "description": "Open Fitness hub",
+      "url": "./#fitness",
+      "icons": [{ "src": "icon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "Grocery List",
+      "short_name": "Grocery",
+      "description": "Open your grocery list",
+      "url": "./#grocery",
+      "icons": [{ "src": "icon.svg", "sizes": "any" }]
+    }
+  ]
+}
