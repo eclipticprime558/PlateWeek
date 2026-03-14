@@ -368,6 +368,42 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .feas-warn{background:var(--adim);border:1px solid rgba(232,160,48,.3)}
 .feas-bad{background:var(--rdim);border:1px solid rgba(224,85,85,.3)}
 .week-plan-item{font-size:12px;padding:7px 0;border-bottom:1px solid var(--border);line-height:1.5;color:var(--text)}
+
+/* ─── FITNESS VIEW ─── */
+.fit-wrap{padding:16px 24px;animation:fadeIn .3s ease}
+.fit-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px}
+.fit-title{font-family:'Playfair Display',serif;font-size:22px}
+/* Muscle group tiles */
+.mg-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:22px}
+.mg-tile{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .15s;position:relative;overflow:hidden}
+.mg-tile:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.3)}
+.mg-tile.active{border-width:2px}
+.mg-body{position:relative;margin:0 auto 8px;width:48px;height:72px}
+.mg-svg{width:48px;height:72px}
+.mg-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.mg-count{font-size:9px;color:var(--t3);margin-top:2px}
+/* Exercise cards grid */
+.ex-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.ex-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:all .15s;cursor:default}
+.ex-card:hover{border-color:rgba(232,160,48,.4);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.ex-thumb{width:100%;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;font-size:52px;position:relative;overflow:hidden}
+.ex-thumb-sub{position:absolute;bottom:6px;right:8px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:2px 7px;border-radius:20px}
+.ex-body{padding:13px 14px 14px}
+.ex-name{font-family:'Playfair Display',serif;font-size:15px;margin-bottom:6px}
+.ex-badges{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:9px}
+.ex-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;text-transform:uppercase;letter-spacing:.5px}
+.ex-desc{font-size:11px;color:var(--t2);line-height:1.6;margin-bottom:11px}
+.ex-actions{display:flex;gap:7px}
+.ex-add{flex:1;padding:7px;background:var(--amber);color:#000;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .15s}
+.ex-add:hover{background:#f0aa3c}
+.ex-yt{padding:7px 10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-size:11px;color:var(--red);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;text-decoration:none;display:flex;align-items:center;gap:4px}
+.ex-yt:hover{border-color:var(--red);background:var(--rdim)}
+/* Voice fix */
+.vp-tap-btn{width:100%;padding:10px;background:var(--green);color:#fff;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:13px;cursor:pointer;margin-top:10px;transition:background .15s}
+.vp-tap-btn:hover{background:#48996a}
+.vp-countdown{font-size:10px;color:var(--t3);text-align:center;margin-top:5px}
+@media(max-width:960px){.mg-grid{grid-template-columns:repeat(4,1fr)}.ex-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.mg-grid{grid-template-columns:repeat(3,1fr)}.ex-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -379,10 +415,11 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
     </div>
     <div class="hdr-right">
       <div class="nav-tabs">
-        <button class="nav-tab active" onclick="setView('week')">Week</button>
-        <button class="nav-tab" onclick="setView('day')">Day</button>
+        <button class="nav-tab active" onclick="setView('week')">📅 Week</button>
+        <button class="nav-tab" onclick="setView('day')">📆 Day</button>
+        <button class="nav-tab" onclick="setView('fitness')">💪 Fitness</button>
         <button class="nav-tab" onclick="setView('grocery')">🛒 Grocery</button>
-        <button class="nav-tab" onclick="setView('history')">History</button>
+        <button class="nav-tab" onclick="setView('history')">📋 Log</button>
         <button class="nav-tab" onclick="setView('goals')">🎯 Goals</button>
       </div>
       <button class="btn" onclick="openPlanWizard('tomorrow')" style="border-color:var(--amid);color:var(--amber)">📅 Plan Tomorrow</button>
@@ -420,20 +457,22 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 <!-- Voice FAB -->
 <div id="voice-fab" onclick="Voice.togglePanel()" title="Say 'Plate Week, add [item]'">🎙</div>
 <div id="voice-panel">
-  <div class="vp-status" id="vp-status">Say wake phrase to start</div>
+  <div class="vp-status" id="vp-status">Tap button below to speak</div>
   <div class="vp-heard" id="vp-heard">—</div>
   <div class="vp-waves" id="vp-waves" style="display:none">
     <div class="vp-bar"></div><div class="vp-bar"></div><div class="vp-bar"></div>
     <div class="vp-bar"></div><div class="vp-bar"></div>
   </div>
-  <div class="vp-hint" id="vp-hint">Say <strong style="color:var(--amber)">"Plate Week"</strong> to wake, then:<br>
+  <div class="vp-hint" id="vp-hint">After tapping, say any command:<br>
     <span class="vp-voice-cmd">"add eggs"</span>
-    <span class="vp-voice-cmd">"add chicken breast"</span><br>
+    <span class="vp-voice-cmd">"add chicken"</span><br>
     <span class="vp-voice-cmd">"I ate a Big Mac"</span>
     <span class="vp-voice-cmd">"I had scrambled eggs"</span>
+    <br><span style="color:var(--t3);font-size:10px">Or say <strong style="color:var(--amber)">"Plate Week"</strong> as wake phrase anytime</span>
   </div>
-  <div class="vp-shortcut-hint">
-    <span>Last added:</span>
+  <button class="vp-tap-btn" onclick="Voice.activateNow()">🎙 Tap to Speak</button>
+  <div class="vp-shortcut-hint" style="margin-top:8px">
+    <span>Last action:</span>
     <span id="vp-last" style="color:var(--text);font-size:11px">—</span>
   </div>
 </div>
@@ -627,6 +666,85 @@ const FOOD_DB=[
   {n:"Whole Milk 8oz",c:149},{n:"Almond Milk 8oz",c:40},
   {n:"Soda 12oz",c:150},{n:"Diet Soda",c:0},{n:"Beer Regular",c:154},
   {n:"Wine Glass",c:125},{n:"Protein Shake",c:160},{n:"Sports Drink 20oz",c:130},
+];
+
+// ── Muscle Groups ──
+const MUSCLE_GROUPS=[
+  {id:'all',     label:'All',       emoji:'⚡', color:'#E8A030', dim:'#3A2E14', paths:[]},
+  {id:'chest',   label:'Chest',     emoji:'💢', color:'#E05555', dim:'#2A1616', paths:['chest']},
+  {id:'back',    label:'Back',      emoji:'🔵', color:'#5B9BD5', dim:'#162236', paths:['back']},
+  {id:'shoulders',label:'Shoulders',emoji:'🔴', color:'#A78BFA', dim:'#1E1A36', paths:['shoulders']},
+  {id:'biceps',  label:'Biceps',    emoji:'💪', color:'#F97316', dim:'#2A1A0C', paths:['biceps']},
+  {id:'triceps', label:'Triceps',   emoji:'🟡', color:'#FACC15', dim:'#2A2400', paths:['triceps']},
+  {id:'core',    label:'Core',      emoji:'⭕', color:'#4CAF7C', dim:'#0F2018', paths:['core']},
+  {id:'legs',    label:'Legs',      emoji:'🦵', color:'#2DD4BF', dim:'#0D2420', paths:['legs']},
+  {id:'glutes',  label:'Glutes',    emoji:'🍑', color:'#F97316', dim:'#2A1A0C', paths:['glutes']},
+  {id:'cardio',  label:'Cardio',    emoji:'❤️', color:'#E05555', dim:'#2A1616', paths:[]},
+];
+
+// ── Exercise Library ──
+const FITNESS_EXERCISES=[
+  // CHEST
+  {id:'pushup',       name:'Push-ups',          group:'chest',    secondary:['triceps','shoulders'], calPerMin:7,  level:'Beginner',     sets:'3 × 12',  emoji:'🤸', bg:'#2A1616', color:'#E05555', desc:'Start in plank. Lower until chest nearly touches floor, elbows at 45°. Push back up through palms.', yt:'IODxDxX7oi4'},
+  {id:'bench',        name:'Bench Press',        group:'chest',    secondary:['triceps','shoulders'], calPerMin:8,  level:'Intermediate', sets:'4 × 8',   emoji:'🏋️', bg:'#2A1616', color:'#E05555', desc:'Lie on flat bench. Lower bar to chest, slight arch, feet flat. Press up to full extension.', yt:'SCVCLChPQm'},
+  {id:'incline',      name:'Incline Press',      group:'chest',    secondary:['shoulders'],           calPerMin:8,  level:'Intermediate', sets:'3 × 10',  emoji:'📐', bg:'#2A1616', color:'#E05555', desc:'Bench at 30–45°. Targets upper chest. Control descent, press explosively.', yt:'DbFgADa2PL8'},
+  {id:'dbell_fly',    name:'Dumbbell Flyes',     group:'chest',    secondary:[],                      calPerMin:6,  level:'Intermediate', sets:'3 × 12',  emoji:'🦅', bg:'#2A1616', color:'#E05555', desc:'Lie flat. Wide arc bringing dumbbells together. Keep slight bend at elbows throughout.', yt:'eozdVDA78K0'},
+  {id:'cable_fly',    name:'Cable Crossover',    group:'chest',    secondary:[],                      calPerMin:6,  level:'Intermediate', sets:'3 × 15',  emoji:'✂️', bg:'#2A1616', color:'#E05555', desc:'High cable pulleys. Pull hands together in front. Maximize chest stretch at top.', yt:'taI4XduLpTk'},
+  {id:'chest_dips',   name:'Chest Dips',         group:'chest',    secondary:['triceps'],             calPerMin:8,  level:'Intermediate', sets:'3 × 10',  emoji:'⬇️', bg:'#2A1616', color:'#E05555', desc:'Lean forward on parallel bars. Lower until stretch in chest, press back up.', yt:'2z8JmcrW-As'},
+  // BACK
+  {id:'pullup',       name:'Pull-ups',            group:'back',     secondary:['biceps'],              calPerMin:8,  level:'Intermediate', sets:'4 × 8',   emoji:'⬆️', bg:'#162236', color:'#5B9BD5', desc:'Hang from bar, palms forward. Pull until chin clears bar. Full hang at bottom between reps.', yt:'eGo4IYlbE5g'},
+  {id:'chinup',       name:'Chin-ups',            group:'back',     secondary:['biceps'],              calPerMin:8,  level:'Beginner',     sets:'3 × 8',   emoji:'🤜', bg:'#162236', color:'#5B9BD5', desc:'Palms face you — slightly easier than pull-ups. Hits biceps harder. Control the descent.', yt:'A_Cb5MZBLok'},
+  {id:'lat_pull',     name:'Lat Pulldown',        group:'back',     secondary:['biceps'],              calPerMin:7,  level:'Beginner',     sets:'4 × 12',  emoji:'⬇️', bg:'#162236', color:'#5B9BD5', desc:'Wide grip. Pull bar to upper chest, lean back slightly. Squeeze lats at bottom position.', yt:'CAwf7n6Luuc'},
+  {id:'bent_row',     name:'Bent-Over Row',       group:'back',     secondary:['biceps','shoulders'],  calPerMin:8,  level:'Intermediate', sets:'4 × 10',  emoji:'🔄', bg:'#162236', color:'#5B9BD5', desc:'Hinge at hips, back flat. Pull bar to lower chest, drive elbows behind you.', yt:'FWJR5Ve8bnQ'},
+  {id:'deadlift',     name:'Deadlift',            group:'back',     secondary:['legs','glutes','core'],calPerMin:9,  level:'Intermediate', sets:'4 × 5',   emoji:'🏆', bg:'#162236', color:'#5B9BD5', desc:'Bar over feet. Flat back, push the floor away. Hinge — do not squat. Best strength builder.', yt:'op9kVnSso6Q'},
+  {id:'seated_row',   name:'Seated Cable Row',    group:'back',     secondary:['biceps'],              calPerMin:6,  level:'Beginner',     sets:'3 × 12',  emoji:'🚣', bg:'#162236', color:'#5B9BD5', desc:'Sit tall, neutral grip. Pull to midsection, squeeze shoulder blades together at end.', yt:'GZbfZ033f74'},
+  // SHOULDERS
+  {id:'ohp',          name:'Overhead Press',      group:'shoulders',secondary:['triceps'],             calPerMin:7,  level:'Intermediate', sets:'4 × 8',   emoji:'🙌', bg:'#1E1A36', color:'#A78BFA', desc:'Press barbell from shoulder height to lockout overhead. No leg drive — strict press.', yt:'2yjwXTZgjDE'},
+  {id:'lat_raise',    name:'Lateral Raises',      group:'shoulders',secondary:[],                      calPerMin:5,  level:'Beginner',     sets:'3 × 15',  emoji:'✈️', bg:'#1E1A36', color:'#A78BFA', desc:'Raise dumbbells out to sides to shoulder height. Slight elbow bend. Lead with elbows.', yt:'3VcKaXpzqRo'},
+  {id:'face_pull',    name:'Face Pulls',          group:'shoulders',secondary:['back'],                calPerMin:5,  level:'Beginner',     sets:'3 × 20',  emoji:'🎯', bg:'#1E1A36', color:'#A78BFA', desc:'Cable at forehead height, rope attachment. Pull toward face, elbows high. Rear delt focus.', yt:'rep-qVOkidI'},
+  {id:'arnold',       name:'Arnold Press',        group:'shoulders',secondary:['triceps'],             calPerMin:7,  level:'Intermediate', sets:'3 × 10',  emoji:'🌀', bg:'#1E1A36', color:'#A78BFA', desc:'Start palms facing you at chin, rotate to press overhead. Full shoulder activation.', yt:'6Z15_WdXmVw'},
+  {id:'shrugs',       name:'Shrugs',              group:'shoulders',secondary:[],                      calPerMin:5,  level:'Beginner',     sets:'3 × 15',  emoji:'🤷', bg:'#1E1A36', color:'#A78BFA', desc:'Heavy dumbbells or barbell. Shrug straight up, hold 1 second at top, slow controlled descent.', yt:'cJRVVxmytaM'},
+  // BICEPS
+  {id:'curl',         name:'Bicep Curls',         group:'biceps',   secondary:[],                      calPerMin:5,  level:'Beginner',     sets:'3 × 12',  emoji:'💪', bg:'#2A1A0C', color:'#F97316', desc:'Stand with dumbbells. Curl to shoulder, squeeze hard at top. Full extension at bottom. No swinging.', yt:'ykJmrZ5v0Oo'},
+  {id:'hammer',       name:'Hammer Curls',        group:'biceps',   secondary:['forearms'],             calPerMin:5,  level:'Beginner',     sets:'3 × 12',  emoji:'🔨', bg:'#2A1A0C', color:'#F97316', desc:'Neutral grip (thumbs up). Hits long head and brachialis. Great for arm thickness.', yt:'zC3nLlEvin4'},
+  {id:'conc_curl',    name:'Concentration Curl',  group:'biceps',   secondary:[],                      calPerMin:4,  level:'Beginner',     sets:'3 × 12',  emoji:'🎯', bg:'#2A1A0C', color:'#F97316', desc:'Seated, elbow braced on inner thigh. Pure isolation — best for bicep peak development.', yt:'0AUGkch3tzc'},
+  {id:'preacher',     name:'Preacher Curls',      group:'biceps',   secondary:[],                      calPerMin:4,  level:'Intermediate', sets:'3 × 10',  emoji:'🙏', bg:'#2A1A0C', color:'#F97316', desc:'Rest arm on angled pad. No cheating possible. Amazing stretch at the bottom position.', yt:'fIWP-FRFNU0'},
+  {id:'incline_curl', name:'Incline Dumbbell Curl',group:'biceps',  secondary:[],                      calPerMin:5,  level:'Intermediate', sets:'3 × 12',  emoji:'📐', bg:'#2A1A0C', color:'#F97316', desc:'Seat inclined back. Arms hang, full stretch at bottom. Best long head activation.', yt:'soxrZlIl35U'},
+  // TRICEPS
+  {id:'tdips',        name:'Tricep Dips',         group:'triceps',  secondary:['chest'],               calPerMin:8,  level:'Beginner',     sets:'3 × 12',  emoji:'⬇️', bg:'#2A2400', color:'#FACC15', desc:'Parallel bars. Elbows point back — not out. Lower to 90°, press back up. Keep body upright.', yt:'0326dy_-CzM'},
+  {id:'pushdown',     name:'Tricep Pushdown',     group:'triceps',  secondary:[],                      calPerMin:5,  level:'Beginner',     sets:'3 × 15',  emoji:'⬇️', bg:'#2A2400', color:'#FACC15', desc:'Cable with rope or straight bar, high pulley. Elbows pinned to sides. Push to full extension.', yt:'2-LAMcpzODU'},
+  {id:'skull_crush',  name:'Skull Crushers',      group:'triceps',  secondary:[],                      calPerMin:6,  level:'Intermediate', sets:'4 × 10',  emoji:'💀', bg:'#2A2400', color:'#FACC15', desc:'Lie on bench. Lower EZ-bar or dumbbells toward forehead. Elbows stationary, extend up.', yt:'d_KZxkY_0cM'},
+  {id:'oh_ext',       name:'Overhead Extension',  group:'triceps',  secondary:[],                      calPerMin:5,  level:'Beginner',     sets:'3 × 12',  emoji:'⬆️', bg:'#2A2400', color:'#FACC15', desc:'Hold dumbbell overhead with both hands. Lower behind head. Keep elbows close together.', yt:'YbX7Wd8jQ-Q'},
+  {id:'cg_bench',     name:'Close-Grip Bench',    group:'triceps',  secondary:['chest'],               calPerMin:8,  level:'Intermediate', sets:'4 × 8',   emoji:'👐', bg:'#2A2400', color:'#FACC15', desc:'Bench press with shoulder-width grip. Great mass builder. Elbows track back, not flare out.', yt:'nEF0bv2FW9s'},
+  // CORE
+  {id:'plank',        name:'Plank',               group:'core',     secondary:['shoulders'],           calPerMin:4,  level:'Beginner',     sets:'3 × 60s', emoji:'📏', bg:'#0F2018', color:'#4CAF7C', desc:'Forearms down, straight line head-to-heel. Brace core like bracing for a punch. Breathe normally.', yt:'ASdvN_XEl_c'},
+  {id:'crunch',       name:'Crunches',            group:'core',     secondary:[],                      calPerMin:4,  level:'Beginner',     sets:'3 × 20',  emoji:'🌀', bg:'#0F2018', color:'#4CAF7C', desc:'Lie on back, hands lightly behind head. Curl shoulder blades up. Exhale at top. Don\'t pull neck.', yt:'MKmrqcoCZ-M'},
+  {id:'leg_raise',    name:'Hanging Leg Raises',  group:'core',     secondary:[],                      calPerMin:5,  level:'Intermediate', sets:'3 × 15',  emoji:'⬆️', bg:'#0F2018', color:'#4CAF7C', desc:'Hang from bar. Raise legs to 90° or higher. Control the descent slowly for maximum tension.', yt:'hdng3vmclGY'},
+  {id:'russian',      name:'Russian Twists',      group:'core',     secondary:[],                      calPerMin:5,  level:'Beginner',     sets:'3 × 20',  emoji:'🌀', bg:'#0F2018', color:'#4CAF7C', desc:'Sit at 45°, feet elevated. Rotate side to side, touch floor each rep. Add weight to progress.', yt:'wkD8rjkodUI'},
+  {id:'bicycle',      name:'Bicycle Crunches',    group:'core',     secondary:[],                      calPerMin:5,  level:'Beginner',     sets:'3 × 20',  emoji:'🚴', bg:'#0F2018', color:'#4CAF7C', desc:'Alternate elbow to opposite knee. Highest rectus abdominis activation of any ab exercise.', yt:'9FGilxCbdz8'},
+  {id:'ab_wheel',     name:'Ab Wheel Rollout',    group:'core',     secondary:['back'],                calPerMin:6,  level:'Advanced',     sets:'3 × 10',  emoji:'☸️', bg:'#0F2018', color:'#4CAF7C', desc:'Kneel. Roll forward until nearly flat. Pull back using core only — not hip flexors or arms.', yt:'4pKly2JojMw'},
+  // LEGS
+  {id:'squat',        name:'Barbell Squat',       group:'legs',     secondary:['glutes','core'],       calPerMin:9,  level:'Intermediate', sets:'4 × 8',   emoji:'👑', bg:'#0D2420', color:'#2DD4BF', desc:'Bar on upper traps. Squat to parallel minimum. Drive knees out, chest up throughout.', yt:'ultWZbUMPL8'},
+  {id:'goblet',       name:'Goblet Squat',        group:'legs',     secondary:['glutes','core'],       calPerMin:8,  level:'Beginner',     sets:'3 × 12',  emoji:'🥤', bg:'#0D2420', color:'#2DD4BF', desc:'Hold dumbbell at chest. Perfect squat pattern — elbows inside knees, deep range of motion.', yt:'MeIiIdhvXT4'},
+  {id:'lunges',       name:'Lunges',              group:'legs',     secondary:['glutes'],              calPerMin:7,  level:'Beginner',     sets:'3 × 12',  emoji:'👟', bg:'#0D2420', color:'#2DD4BF', desc:'Step forward, lower back knee toward floor. Keep front shin vertical, torso upright.', yt:'QOVaHwm-Q6U'},
+  {id:'leg_press',    name:'Leg Press',           group:'legs',     secondary:['glutes'],              calPerMin:7,  level:'Beginner',     sets:'4 × 12',  emoji:'🔩', bg:'#0D2420', color:'#2DD4BF', desc:'Feet high and wide = more glutes. Feet low and narrow = more quads. Don\'t lock knees at top.', yt:'IZxyjW7MPJQ'},
+  {id:'rdl',          name:'Romanian Deadlift',   group:'legs',     secondary:['glutes','back'],       calPerMin:8,  level:'Intermediate', sets:'3 × 10',  emoji:'🎣', bg:'#0D2420', color:'#2DD4BF', desc:'Hinge with soft knees. Bar stays close to legs. Feel hamstring stretch. Don\'t round back.', yt:'JCXUYuzwNrM'},
+  {id:'leg_curl',     name:'Leg Curls',           group:'legs',     secondary:[],                      calPerMin:5,  level:'Beginner',     sets:'3 × 12',  emoji:'🦵', bg:'#0D2420', color:'#2DD4BF', desc:'Machine exercise. Curl heels to glutes. Best isolation for hamstrings. Control the return.', yt:'1Tq3QdYUuHs'},
+  {id:'calf_raise',   name:'Calf Raises',         group:'legs',     secondary:[],                      calPerMin:4,  level:'Beginner',     sets:'4 × 20',  emoji:'👠', bg:'#0D2420', color:'#2DD4BF', desc:'Stand on step edge. Rise onto toes, full stretch at bottom. 3-second descent for growth.', yt:'gwLzBJYoWlQ'},
+  // GLUTES
+  {id:'hip_thrust',   name:'Hip Thrust',          group:'glutes',   secondary:['legs'],                calPerMin:7,  level:'Beginner',     sets:'4 × 12',  emoji:'⬆️', bg:'#2A1A0C', color:'#F97316', desc:'Upper back on bench, barbell on hips with pad. Drive hips up, hard glute squeeze at top.', yt:'SEdqd9GgG4c'},
+  {id:'glute_bridge', name:'Glute Bridge',        group:'glutes',   secondary:['core'],                calPerMin:5,  level:'Beginner',     sets:'3 × 20',  emoji:'🌉', bg:'#2A1A0C', color:'#F97316', desc:'Lie on back, feet flat. Drive hips up and hold 2 seconds. Add barbell for progression.', yt:'wPM8icPu6H8'},
+  {id:'sumo_squat',   name:'Sumo Squat',          group:'glutes',   secondary:['legs'],                calPerMin:8,  level:'Beginner',     sets:'3 × 12',  emoji:'🤼', bg:'#2A1A0C', color:'#F97316', desc:'Wide stance, toes out 45°. Lower between legs. Hits inner thighs and glutes hard.', yt:'xfPMzN9rk-Q'},
+  {id:'kickback',     name:'Cable Kickbacks',     group:'glutes',   secondary:[],                      calPerMin:5,  level:'Beginner',     sets:'3 × 15',  emoji:'🦵', bg:'#2A1A0C', color:'#F97316', desc:'Ankle strap on cable. Kick leg back and up. Slight forward lean, squeeze glute at top.', yt:'9LKVzjHfwKQ'},
+  // CARDIO
+  {id:'running',      name:'Running',             group:'cardio',   secondary:['legs'],                calPerMin:10, level:'Beginner',     sets:'20–40 min',emoji:'🏃', bg:'#2A1616', color:'#E05555', desc:'Mix steady-state and intervals. Land midfoot, not heel. Keeps joints healthier long-term.', yt:'_kGESn8ArrU'},
+  {id:'jump_rope',    name:'Jump Rope',           group:'cardio',   secondary:['calves'],              calPerMin:12, level:'Beginner',     sets:'3 × 3 min',emoji:'⚡', bg:'#2A1616', color:'#E05555', desc:'Highest cal burn per minute of any cardio. Start with singles, progress to doubles. Land softly.', yt:'FJmRQ5iTXKE'},
+  {id:'cycling',      name:'Cycling',             group:'cardio',   secondary:['legs'],                calPerMin:8,  level:'Beginner',     sets:'30–60 min',emoji:'🚴', bg:'#2A1616', color:'#E05555', desc:'Low-impact. Great for bad knees. Push through the full pedal rotation for max power.', yt:'6MRboJjv3KU'},
+  {id:'rowing',       name:'Rowing Machine',      group:'cardio',   secondary:['back','arms'],         calPerMin:9,  level:'Beginner',     sets:'20–30 min',emoji:'🚣', bg:'#2A1616', color:'#E05555', desc:'60% legs, 20% lean-back, 20% arm pull. Reverse to return. Full body cardio masterpiece.', yt:'H0r_hBpRBRg'},
+  {id:'hiit_sprint',  name:'HIIT Sprints',        group:'cardio',   secondary:[],                      calPerMin:13, level:'Intermediate', sets:'8×20s on',  emoji:'🔥', bg:'#2A1616', color:'#E05555', desc:'Sprint 20s all out, rest 40s. Repeat 8 rounds. Burns fat for 24 hours after. Most efficient.', yt:'ml6cT4AZdqI'},
+  {id:'jjacks',       name:'Jumping Jacks',       group:'cardio',   secondary:[],                      calPerMin:8,  level:'Beginner',     sets:'3 × 60s',  emoji:'🙌', bg:'#2A1616', color:'#E05555', desc:'Jump feet apart while raising arms overhead. No equipment needed. Great warm-up too.', yt:'iSSAk4XCsRA'},
+  {id:'burpees',      name:'Burpees',             group:'cardio',   secondary:['chest','core'],        calPerMin:10, level:'Intermediate', sets:'3 × 10',   emoji:'🔥', bg:'#2A1616', color:'#E05555', desc:'Squat → jump back to plank → push-up → jump forward → jump up. Full body in one move.', yt:'auBLPXO8Fww'},
+  {id:'kb_swing',     name:'Kettlebell Swing',    group:'cardio',   secondary:['glutes','back'],       calPerMin:10, level:'Beginner',     sets:'4 × 20',   emoji:'🔔', bg:'#2A1616', color:'#E05555', desc:'Hip hinge power movement — not a squat. Snap hips forward. Swing to shoulder height.', yt:'mKDIuUbH94Q'},
 ];
 
 // ── Workout MET values (metabolic equivalent) ──
@@ -1208,7 +1326,23 @@ const Voice={
     this.panelOpen=!this.panelOpen;
     const panel=document.getElementById('voice-panel');
     panel.classList.toggle('show',this.panelOpen);
-    if(this.panelOpen&&this.state==='off') this.init();
+    if(this.panelOpen){
+      if(this.state==='off') this.init();
+      // Immediately go to activated (ready for commands) when user taps the button
+      setTimeout(()=>{
+        if(this.state==='idle'){
+          this.setState('activated');
+          this.speak('Ready');
+        }
+      },300);
+    }
+  },
+
+  activateNow(){
+    if(this.state==='off'){this.init();setTimeout(()=>this.setState('activated'),500);}
+    else{this.setState('activated');this.speak('Ready');}
+    this.panelOpen=true;
+    document.getElementById('voice-panel').classList.add('show');
   },
 
   toggleMic(){
@@ -1235,6 +1369,7 @@ let ST={
   dragSrcIdx:null,
   foodLogTarget:null,flPending:null,
   profileGoal:null,
+  fitMuscle:'all',
 };
 
 // ═══════════════════════════════════════════════
@@ -1290,9 +1425,10 @@ function render(){
   else if(ST.view==='day') area.innerHTML=renderDayView();
   else if(ST.view==='grocery') area.innerHTML=renderGroceryView();
   else if(ST.view==='history') area.innerHTML=renderHistoryView();
+  else if(ST.view==='fitness') area.innerHTML=renderFitnessView();
   else if(ST.view==='goals') area.innerHTML=renderGoalsView();
   document.querySelectorAll('.nav-tab').forEach((t,i)=>{
-    t.classList.toggle('active',['week','day','grocery','history','goals'][i]===ST.view);
+    t.classList.toggle('active',['week','day','fitness','grocery','history','goals'][i]===ST.view);
   });
 }
 
@@ -1672,6 +1808,150 @@ function renderCalorieWidget(dateKey){
     ${foodLog.length?`<div style="margin-top:4px">${logEntries}</div>`:`<div style="font-size:11px;color:var(--t3);padding:6px 0">No food logged yet — tap "+ Log Food" or say "Plate Week, I ate [food]"</div>`}
     ${recHtml}
   </div>`;
+}
+
+// ─────────────────── Body SVG per muscle group ───────────────────
+function buildBodySVG(active){
+  const hi=active==='all'?'rgba(232,160,48,.5)':'rgba(232,160,48,.9)';
+  const dim='rgba(240,237,230,.08)';
+  function c(g){return(active==='all'||active===g)?hi:dim;}
+  return`<svg viewBox="0 0 100 165" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+    <!-- Head -->
+    <circle cx="50" cy="12" r="9" fill="${dim}" stroke="rgba(240,237,230,.15)" stroke-width=".5"/>
+    <!-- Neck -->
+    <rect x="46" y="20" width="8" height="7" rx="2" fill="${dim}"/>
+    <!-- Chest -->
+    <path d="M32 27 Q50 24 68 27 L66 52 Q50 55 34 52 Z" fill="${c('chest')}" onclick="selectMuscle('chest')" style="cursor:pointer"/>
+    <!-- Left shoulder -->
+    <ellipse cx="27" cy="33" rx="7" ry="8" fill="${c('shoulders')}" onclick="selectMuscle('shoulders')" style="cursor:pointer"/>
+    <!-- Right shoulder -->
+    <ellipse cx="73" cy="33" rx="7" ry="8" fill="${c('shoulders')}" onclick="selectMuscle('shoulders')" style="cursor:pointer"/>
+    <!-- Left bicep/arm -->
+    <path d="M22 40 L18 68 L28 70 L30 42 Z" fill="${c('biceps')}" onclick="selectMuscle('biceps')" style="cursor:pointer"/>
+    <!-- Right bicep/arm -->
+    <path d="M78 40 L82 68 L72 70 L70 42 Z" fill="${c('biceps')}" onclick="selectMuscle('biceps')" style="cursor:pointer"/>
+    <!-- Left tricep (back side — shown as side) -->
+    <path d="M20 42 L16 68 L23 68 L26 43 Z" fill="${c('triceps')}" onclick="selectMuscle('triceps')" style="cursor:pointer;opacity:.7"/>
+    <!-- Right tricep -->
+    <path d="M80 42 L84 68 L77 68 L74 43 Z" fill="${c('triceps')}" onclick="selectMuscle('triceps')" style="cursor:pointer;opacity:.7"/>
+    <!-- Forearms -->
+    <path d="M18 68 L15 92 L24 92 L27 68 Z" fill="${dim}"/>
+    <path d="M82 68 L85 92 L76 92 L73 68 Z" fill="${dim}"/>
+    <!-- Core/Abs -->
+    <path d="M34 52 Q50 56 66 52 L64 78 Q50 82 36 78 Z" fill="${c('core')}" onclick="selectMuscle('core')" style="cursor:pointer"/>
+    <!-- Hips/lower -->
+    <path d="M36 78 Q50 83 64 78 L62 92 Q50 96 38 92 Z" fill="${c('glutes')}" onclick="selectMuscle('glutes')" style="cursor:pointer"/>
+    <!-- Back indicator on shoulders -->
+    <path d="M34 27 L36 52 L34 52 L32 28 Z" fill="${c('back')}" onclick="selectMuscle('back')" style="cursor:pointer;opacity:.6"/>
+    <path d="M66 27 L64 52 L66 52 L68 28 Z" fill="${c('back')}" onclick="selectMuscle('back')" style="cursor:pointer;opacity:.6"/>
+    <!-- Left quad -->
+    <path d="M38 92 L36 130 L48 130 L48 92 Z" fill="${c('legs')}" onclick="selectMuscle('legs')" style="cursor:pointer"/>
+    <!-- Right quad -->
+    <path d="M62 92 L64 130 L52 130 L52 92 Z" fill="${c('legs')}" onclick="selectMuscle('legs')" style="cursor:pointer"/>
+    <!-- Left lower leg -->
+    <path d="M36 130 L35 158 L47 158 L48 130 Z" fill="${dim}"/>
+    <!-- Right lower leg -->
+    <path d="M64 130 L65 158 L53 158 L52 130 Z" fill="${dim}"/>
+  </svg>`;
+}
+
+function renderFitnessView(){
+  const filtered=ST.fitMuscle==='all'?FITNESS_EXERCISES:FITNESS_EXERCISES.filter(e=>e.group===ST.fitMuscle||e.secondary.includes(ST.fitMuscle));
+  const todayKey=dk(new Date());
+  const wk=S.get('workouts',{});
+  const todayWo=wk[todayKey];
+
+  const mgTiles=MUSCLE_GROUPS.map(mg=>{
+    const cnt=mg.id==='all'?FITNESS_EXERCISES.length:FITNESS_EXERCISES.filter(e=>e.group===mg.id).length;
+    const active=ST.fitMuscle===mg.id;
+    return`<div class="mg-tile${active?' active':''}" onclick="selectMuscle('${mg.id}')"
+      style="border-color:${active?mg.color:'var(--border)'};${active?`background:${mg.dim};box-shadow:0 0 16px ${mg.color}30`:''}"
+    >
+      <div class="mg-body">${buildBodySVG(active?mg.id:'none')}</div>
+      <div class="mg-label" style="color:${active?mg.color:'var(--t2)'}">${mg.label}</div>
+      <div class="mg-count">${cnt} exercises</div>
+    </div>`;
+  }).join('');
+
+  const exCards=filtered.map(ex=>{
+    const ytUrl=`https://www.youtube.com/watch?v=${ex.yt}`;
+    const ytThumb=`https://img.youtube.com/vi/${ex.yt}/mqdefault.jpg`;
+    const levelColor=ex.level==='Beginner'?'var(--green)':ex.level==='Intermediate'?'var(--amber)':'var(--red)';
+    const levelDim=ex.level==='Beginner'?'var(--gdim)':ex.level==='Intermediate'?'var(--adim)':'var(--rdim)';
+    const mg=MUSCLE_GROUPS.find(m=>m.id===ex.group)||MUSCLE_GROUPS[1];
+    const secStr=ex.secondary.map(s=>MUSCLE_GROUPS.find(m=>m.id===s)?.label||s).join(', ');
+    return`<div class="ex-card">
+      <div class="ex-thumb" style="background:${ex.bg};min-height:120px" onclick="window.open('${ytUrl}','_blank')" title="Watch tutorial on YouTube">
+        <img src="${ytThumb}" alt="${ex.name}" style="width:100%;height:100%;object-fit:cover;opacity:.85" onerror="this.style.display='none';this.nextSibling.style.display='flex'" loading="lazy">
+        <div style="display:none;width:100%;height:100%;align-items:center;justify-content:center;font-size:56px;flex-direction:column;gap:6px">
+          <span>${ex.emoji}</span>
+        </div>
+        <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.7));padding:8px 10px">
+          <span style="font-size:9px;color:#fff;font-weight:700;letter-spacing:.5px">▶ WATCH TUTORIAL</span>
+        </div>
+      </div>
+      <div class="ex-body">
+        <div class="ex-name">${ex.name}</div>
+        <div class="ex-badges">
+          <span class="ex-badge" style="background:${mg.dim};color:${mg.color}">🎯 ${mg.label}</span>
+          ${secStr?`<span class="ex-badge" style="background:var(--surface);color:var(--t2)">+ ${secStr}</span>`:''}
+          <span class="ex-badge" style="background:${levelDim};color:${levelColor}">${ex.level}</span>
+          <span class="ex-badge" style="background:var(--rdim);color:var(--red)">🔥 ~${ex.calPerMin} cal/min</span>
+        </div>
+        <div class="ex-desc">${ex.desc}</div>
+        <div style="font-size:10px;color:var(--t3);margin-bottom:10px">📋 Suggested: ${ex.sets}</div>
+        <div class="ex-actions">
+          <button class="ex-add" onclick="addExerciseToDay('${ex.id}')">+ Add to Today</button>
+          <a href="${ytUrl}" target="_blank" class="ex-yt">▶ YouTube</a>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const mg=MUSCLE_GROUPS.find(m=>m.id===ST.fitMuscle)||MUSCLE_GROUPS[0];
+
+  return`<div class="fit-wrap">
+    <div class="fit-header">
+      <div>
+        <div class="fit-title">💪 Fitness Library</div>
+        <div style="font-size:11px;color:var(--t3);margin-top:3px">Click a muscle group · Tap any card thumbnail to watch a tutorial</div>
+      </div>
+      ${todayWo?`<div style="background:var(--pdim);border:1px solid rgba(167,139,250,.3);border-radius:10px;padding:8px 14px;font-size:12px;color:var(--purple)">
+        Today: ${todayWo.type} ${todayWo.duration||''}${todayWo.completed?' ✓':''}
+      </div>`:'<button class="btn" onclick="openWoEdit(\''+todayKey+'\')" style="border-color:var(--amid);color:var(--amber)">+ Log Today\'s Workout</button>'}
+    </div>
+
+    <div class="mg-grid">${mgTiles}</div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="font-family:'Playfair Display',serif;font-size:17px">${mg.id==='all'?'All Exercises':`${mg.emoji} ${mg.label} Exercises`}
+        <span style="font-size:12px;color:var(--t3);font-family:'DM Sans',sans-serif;margin-left:8px">${filtered.length} exercises</span>
+      </div>
+    </div>
+
+    ${filtered.length?`<div class="ex-grid">${exCards}</div>`:`<div style="text-align:center;padding:50px 0;color:var(--t3)">
+      <div style="font-size:40px;margin-bottom:12px">${mg.emoji}</div>
+      <div style="font-family:'Playfair Display',serif;font-size:18px;color:var(--t2);margin-bottom:6px">No exercises found</div>
+      <div style="font-size:12px">Try a different muscle group</div>
+    </div>`}
+  </div>`;
+}
+
+function selectMuscle(id){ST.fitMuscle=id;render();}
+
+function addExerciseToDay(exId){
+  const ex=FITNESS_EXERCISES.find(e=>e.id===exId);
+  if(!ex)return;
+  const key=dk(new Date());
+  const wk=S.get('workouts',{});
+  if(!wk[key])wk[key]={type:'💪 Strength',duration:'45 min',notes:'',completed:false};
+  // Append exercise to notes
+  const note=wk[key].notes?wk[key].notes+'\n'+ex.name+' '+ex.sets:ex.name+' '+ex.sets;
+  wk[key].notes=note;
+  wk[key].type='💪 Strength';
+  S.set('workouts',wk);
+  toast('💪',`Added ${ex.name} to today's workout!`);
+  render();
 }
 
 function renderGoalsView(){
