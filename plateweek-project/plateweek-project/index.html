@@ -449,6 +449,38 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .gp-apply-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(232,160,48,.4)}
 @media(max-width:700px){.fit-gender-grid{grid-template-columns:1fr}.fit-goal-grid{grid-template-columns:repeat(2,1fr)}.gp-nutrition{grid-template-columns:1fr}.gp-sched-row{grid-template-columns:44px 1fr 54px}}
 @media(max-width:480px){.fit-goal-grid{grid-template-columns:1fr}}
+
+/* ─── SCHEDULE EXPAND ─── */
+.gp-sched-row{cursor:pointer}
+.gp-sched-row:hover{background:rgba(232,160,48,.04)}
+.gp-sched-toggle{font-size:10px;color:var(--t3);min-width:14px;text-align:right;transition:transform .2s}
+.gp-sched-toggle.open{transform:rotate(90deg);color:var(--amber)}
+.gp-day-expand{padding:12px 14px 16px;background:rgba(255,255,255,.015);border-bottom:1px solid var(--border)}
+.gp-ex-mini{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;display:grid;grid-template-columns:32px 1fr;gap:10px;align-items:start}
+.gp-ex-mini:last-child{margin-bottom:0}
+.gp-ex-mini-emoji{font-size:22px;padding-top:1px}
+.gp-ex-mini-name{font-size:13px;font-weight:600;margin-bottom:4px}
+.gp-ex-mini-why{font-size:11px;color:var(--t2);line-height:1.55;margin-bottom:10px;padding:8px 10px;background:rgba(232,160,48,.06);border-left:2px solid var(--amber);border-radius:0 6px 6px 0}
+.gp-reps-row{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.gp-reps-lbl{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:1px;width:100%;margin-bottom:2px}
+.gp-rep-chip{font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--t2);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.gp-rep-chip:hover{border-color:var(--amber);color:var(--amber)}
+.gp-rep-chip.sel{background:var(--amber);color:#000;border-color:var(--amber)}
+.gp-ex-mini-cal{font-size:10px;color:var(--red);margin-top:6px}
+
+/* ─── GYM SETUP ─── */
+.gym-type-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0 16px}
+.gym-type-card{background:var(--card);border:2px solid var(--border);border-radius:12px;padding:14px 8px;text-align:center;cursor:pointer;transition:all .15s}
+.gym-type-card:hover{border-color:var(--amid);transform:translateY(-2px)}
+.gym-type-card.active{border-color:var(--amber);background:var(--adim)}
+.gym-equip-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;min-height:32px}
+.gym-equip-chip{font-size:11px;padding:4px 10px;border-radius:20px;background:var(--surface);border:1px solid var(--border);color:var(--t2);display:flex;align-items:center;gap:5px}
+.gym-rm{cursor:pointer;color:var(--t3);font-size:11px;transition:color .15s;padding:0 2px}
+.gym-rm:hover{color:var(--red)}
+.gym-add-row{display:flex;gap:8px;margin-top:10px}
+.gym-add-inp{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:7px 11px;font-size:12px;color:var(--text);font-family:'DM Sans',sans-serif}
+.gym-add-inp:focus{outline:none;border-color:var(--amber)}
+@media(max-width:600px){.gym-type-grid{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
@@ -795,6 +827,75 @@ const FITNESS_EXERCISES=[
 // ═══════════════════════════════════════════════
 //  GOAL PROGRAMS  (female + male)
 // ═══════════════════════════════════════════════
+// ── Why each exercise belongs in your plan ──
+const EXERCISE_WHY={
+  pushup:'Zero equipment compound. Hits chest, triceps & shoulders together — burns more calories than any chest isolation.',
+  bench:'4×8 puts you in the hypertrophy sweet spot (tension + volume). King of chest mass — no substitute.',
+  incline:'Upper chest is visually the most impactful region. Incline angle isolates the clavicular head for a full, rounded chest.',
+  dbell_fly:'Peak stretch under load tears more fibers for chest width. Use as a finisher after heavy presses.',
+  cable_fly:'Constant tension through full range of motion. Polishes chest definition and fills in the inner line.',
+  chest_dips:'Leaning forward turns dips into a chest movement. Allows progressive overload with a weight belt.',
+  pullup:'Best lat-width builder. Every pound of back muscle you add raises your metabolism. 4×8 = strength + size.',
+  chinup:'Supinated grip hits biceps harder. Easier starting point — use to build to pull-ups.',
+  lat_pull:'Same pattern as pull-ups with adjustable load. Crucial for back width and shoulder health.',
+  bent_row:'Horizontal pulling builds back thickness that pull-ups miss. Also recruits biceps and rear delts.',
+  deadlift:'Highest calorie-burning lift per set. Trains the entire posterior chain. Non-negotiable for total strength.',
+  seated_row:'Targets mid-back and rhomboids — essential for posture and balancing all the pushing you do.',
+  ohp:'Overhead press is the direct path to shoulder mass. Strict reps = no cheating your way to size.',
+  lat_raise:'Shoulder width comes from lateral raises. Side delts give the broad, athletic silhouette.',
+  face_pull:'Rear delts and rotator cuff are neglected by most. This prevents shoulder injury from heavy pressing.',
+  arnold:'Full rotation hits all three deltoid heads in one movement. Maximum shoulder activation per rep.',
+  shrugs:'Trap development adds mass to the upper back and creates the powerful, athletic neck-shoulder look.',
+  curl:'3-second eccentric (lowering) breaks down more fibers. Slow negatives = more bicep growth.',
+  hammer:'Targets brachialis — the muscle beneath the bicep. Growing it pushes the peak UP for visible size.',
+  preacher:'Eliminates shoulder swing entirely. Pure bicep isolation for peak development and mind-muscle connection.',
+  conc_curl:'Seated concentration removes all body English. Best exercise for building the bicep peak.',
+  tdips:'Triceps = 2/3 of upper arm size. Dips allow progressive overload with added weight for serious growth.',
+  skull_crush:'Overhead position gives maximum long-head stretch — the biggest tricep head. Build here first.',
+  pushdown:'Isolates triceps at the end of workouts. High reps flush blood and complete the pump.',
+  oh_ext:'Overhead extension builds the lower horseshoe of the tricep. Stretch position = maximum fiber recruitment.',
+  cg_bench:'Close grip bench is a compound tricep builder. More weight than isolations for serious mass.',
+  squat:'Activates glutes, quads, hamstrings, and core simultaneously — most calories burned per leg rep.',
+  goblet:'Goblet hold forces upright torso, activating more glutes. Safer and better for beginners than barbell.',
+  leg_press:'Higher volume with lower injury risk than squats. Lets you train legs to failure safely.',
+  lunges:'Single-leg work corrects left/right imbalances. Dynamic stability = more muscle activation per step.',
+  rdl:'#1 hamstring builder. The hip hinge pattern also hits glutes directly — essential for posterior development.',
+  leg_curl:'Isolates hamstrings that compound lifts can miss. Critical for knee stability and balanced legs.',
+  calf_raise:'Calves need 15–25 reps to grow. The slowest-growing muscle — you have to be consistent.',
+  sumo_squat:'Wide stance shifts load to inner thighs and glutes vs. regular squats. Essential for booty programs.',
+  hip_thrust:'Directly maximizes gluteus maximus activation through full hip extension. The #1 booty builder — period.',
+  glute_bridge:'Bodyweight hip thrust. Activates glutes and teaches the movement before adding load.',
+  kickback:'Isolates glute at peak contraction. No other exercise hits the top of the glute like this.',
+  running:'Burns 8–12 cal/min. Preserves lean muscle while creating a calorie deficit. Scalable for any fitness level.',
+  cycling:'Low-impact cardio — easy on knees and hips. 45 min steady state burns 300–600 calories.',
+  hiit_sprint:'20 sec all-out / 10 sec rest. Elevates your metabolism for 24–48 hrs post-workout (afterburn effect).',
+  jump_rope:'Burns 10–16 cal/min — one of the most calorie-dense exercises per minute you can do.',
+  rowing:'Full-body cardio engaging arms, back, and legs. Burns 600+ cal/hr while building muscle too.',
+  burpees:'Full-body compound combining push-up + jump. Spikes heart rate to 90%+ max in seconds.',
+  jjacks:'Accessible HIIT for all levels. Low-impact option: step side-to-side instead of jumping.',
+  kb_swing:'Hip hinge power movement. Trains glutes + posterior chain while spiking heart rate hard.',
+  plank:'Anti-extension stability trains deeper core muscles that crunches miss. Protects your spine under load.',
+  russian:'Rotational work targets obliques directly. Adds that tapered V-shape to the waist.',
+  bicycle:'Highest-activation crunch variation. Upper abs, lower abs, and obliques hit simultaneously.',
+  crunch:'Direct upper ab isolation. 20–30 reps for endurance and to develop visible definition.',
+  leg_raise:'Lower abs are hardest to reach. Leg raises directly target the lower rectus abdominis.',
+  dead_bug:'Anti-rotation core stability. Protects lumbar spine while training deep stabilizer muscles.',
+  ab_wheel:'One of the hardest core exercises. Full anti-extension through trunk, shoulders, and lats.',
+  hiit_bike:'Bike sprints spare the joints while hitting HIIT intensity. Zero impact, maximum calorie burn.',
+};
+
+// ── Gym equipment templates ──
+const GYM_TEMPLATES={
+  full:{label:'Full Gym',emoji:'🏋️',desc:'Commercial gym — all equipment available',
+    equipment:['Barbell + Power Rack','Full Dumbbell Set (5–100 lbs)','Cable Machine','Leg Press','Smith Machine','Pull-up Bar','Treadmill','Stationary Bike','Rowing Machine','Kettlebells','Resistance Bands','Flat + Incline Bench']},
+  apartment:{label:'Apartment Gym',emoji:'🏢',desc:'Building gym — limited but workable',
+    equipment:['Dumbbells (15–50 lbs)','Treadmill or Elliptical','Stationary Bike','Pull-up Bar','Resistance Bands','Adjustable Bench (maybe)']},
+  home:{label:'Home Gym',emoji:'🏠',desc:'Personal setup at home',
+    equipment:['Dumbbells','Pull-up Bar','Adjustable Bench','Resistance Bands','Kettlebell']},
+  none:{label:'No Equipment',emoji:'🤸',desc:'Bodyweight training anywhere',
+    equipment:['Bodyweight only','Open floor space']},
+};
+
 const GOAL_PROGRAMS={
 female:[
   {id:'bigger_booty',label:'Bigger Booty',tagline:'Grow & Lift Your Glutes',emoji:'🍑',color:'#F97316',dim:'#2A1A0C',
@@ -1630,6 +1731,7 @@ let ST={
   fitGender:null,
   fitGoal:null,
   fitBrowseLib:false,
+  fitExpandDay:null,
 };
 
 // ═══════════════════════════════════════════════
@@ -2175,18 +2277,55 @@ function renderGoalProgram(gender, goalId){
   const prog=(GOAL_PROGRAMS[gender]||[]).find(p=>p.id===goalId);
   if(!prog) return renderFitnessGoalPicker(gender);
 
-  const DAY_ORDER=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const customReps=S.get('custom_reps',{});
+  const REP_PRESETS=['3 × 8','3 × 10','3 × 12','4 × 8','4 × 10','4 × 12','5 × 5','2 × 15','3 × 15'];
+
   const schedRows=prog.schedule.map(s=>{
     const isRest=s.exIds.length===0;
+    const isExpanded=ST.fitExpandDay===s.day;
     const exChips=s.exIds.map(id=>{
       const ex=FITNESS_EXERCISES.find(e=>e.id===id);
       return ex?`<span class="gp-sched-ex-chip">${ex.name}</span>`:'';
     }).join('');
-    return`<div class="gp-sched-row${isRest?' gp-sched-row-rest':''}">
-      <div class="gp-sched-day">${s.day}</div>
-      <div class="gp-sched-focus" style="color:${isRest?'var(--t3)':'var(--t2)'}">${s.woType} ${s.focus}</div>
-      <div class="gp-sched-exs">${isRest?'<span style="font-size:11px;color:var(--t3)">Rest & recover</span>':exChips}</div>
-      <div class="gp-sched-dur" style="color:${isRest?'var(--t3)':'var(--amber)'}">${s.dur}</div>
+
+    let expandHtml='';
+    if(isExpanded&&!isRest){
+      const exCards=s.exIds.map(id=>{
+        const ex=FITNESS_EXERCISES.find(e=>e.id===id);
+        if(!ex)return'';
+        const repsKey=`${goalId}_${s.day}_${ex.id}`;
+        const currentReps=customReps[repsKey]||ex.sets;
+        const why=EXERCISE_WHY[ex.id]||ex.desc;
+        const repOptions=REP_PRESETS.map(r=>`<button class="gp-rep-chip${r===currentReps?' sel':''}" onclick="setExReps('${repsKey}','${r}');event.stopPropagation()">${r}</button>`).join('');
+        const durMin=parseInt(currentReps)||3;
+        const estCal=Math.round(ex.calPerMin*(durMin*0.5));
+        return`<div class="gp-ex-mini">
+          <div class="gp-ex-mini-emoji">${ex.emoji}</div>
+          <div>
+            <div class="gp-ex-mini-name">${ex.name}</div>
+            <div class="gp-ex-mini-why">💡 ${why}</div>
+            <div class="gp-reps-row">
+              <div class="gp-reps-lbl">Sets × Reps</div>
+              ${repOptions}
+            </div>
+            <div class="gp-ex-mini-cal">🔥 ~${estCal} cal · ~${ex.calPerMin} cal/min</div>
+          </div>
+        </div>`;
+      }).join('');
+      expandHtml=`<div class="gp-day-expand" onclick="event.stopPropagation()">${exCards}</div>`;
+    }
+
+    return`<div>
+      <div class="gp-sched-row" onclick="toggleDayExpand('${s.day}')">
+        <div class="gp-sched-day">${s.day}</div>
+        <div class="gp-sched-focus" style="color:${isRest?'var(--t3)':'var(--t2)'}">${s.woType} ${s.focus}</div>
+        <div class="gp-sched-exs">${isRest?'<span style="font-size:11px;color:var(--t3)">Rest & recover</span>':exChips}</div>
+        <div class="gp-sched-dur" style="color:${isRest?'var(--t3)':'var(--amber)'};display:flex;align-items:center;gap:4px">
+          <span>${s.dur}</span>
+          ${!isRest?`<span class="gp-sched-toggle${isExpanded?' open':''}">▶</span>`:''}
+        </div>
+      </div>
+      ${expandHtml}
     </div>`;
   }).join('');
 
@@ -2340,11 +2479,13 @@ function renderExerciseLibrary(){
   </div>`;
 }
 
-function selectGender(g){ST.fitGender=g;ST.fitGoal=null;ST.fitBrowseLib=false;render();}
-function selectGoal(id){ST.fitGoal=id;ST.fitBrowseLib=false;render();}
+function selectGender(g){ST.fitGender=g;ST.fitGoal=null;ST.fitBrowseLib=false;ST.fitExpandDay=null;render();}
+function selectGoal(id){ST.fitGoal=id;ST.fitBrowseLib=false;ST.fitExpandDay=null;render();}
 function showExerciseLibrary(){ST.fitBrowseLib=true;render();}
 function backFromLibrary(){ST.fitBrowseLib=false;render();}
 function selectMuscle(id){ST.fitMuscle=id;render();}
+function toggleDayExpand(day){ST.fitExpandDay=ST.fitExpandDay===day?null:day;render();}
+function setExReps(key,val){const r=S.get('custom_reps',{});r[key]=val;S.set('custom_reps',r);render();}
 
 function applyProgramToWeek(gender, goalId){
   const prog=(GOAL_PROGRAMS[gender]||[]).find(p=>p.id===goalId);
@@ -2360,8 +2501,15 @@ function applyProgramToWeek(gender, goalId){
     const key=dk(dates[idx]);
     // Set workout
     if(s.exIds.length>0||s.woType!=='😴 Rest'){
-      const exNames=s.exIds.map(id=>FITNESS_EXERCISES.find(e=>e.id===id)?.name).filter(Boolean);
-      wk[key]={type:s.woType,duration:s.dur,notes:exNames.join('\n'),completed:false};
+      const cr=S.get('custom_reps',{});
+      const exLines=s.exIds.map(id=>{
+        const ex=FITNESS_EXERCISES.find(e=>e.id===id);
+        if(!ex)return null;
+        const rKey=`${goalId}_${s.day}_${id}`;
+        const sets=cr[rKey]||ex.sets;
+        return`${ex.name} — ${sets}`;
+      }).filter(Boolean);
+      wk[key]={type:s.woType,duration:s.dur,notes:exLines.join('\n'),completed:false};
     }
     // Set meals from program suggestions
     const bf=prog.mealSuggestions.Breakfast;
@@ -2524,9 +2672,39 @@ function renderGoalsView(){
     </div>`;
   }
 
+  // ── Gym Setup card ──
+  const gym=S.get('gym',{type:null,equipment:[]});
+  const gymType=gym.type||null;
+  const gymEquipment=gym.equipment||[];
+
+  const gymTypeCards=Object.entries(GYM_TEMPLATES).map(([k,t])=>`
+    <div class="gym-type-card${gymType===k?' active':''}" onclick="selectGymType('${k}')">
+      <div style="font-size:24px;margin-bottom:6px">${t.emoji}</div>
+      <div style="font-size:11px;font-weight:700;color:${gymType===k?'var(--amber)':'var(--t2)'}">${t.label}</div>
+      <div style="font-size:10px;color:var(--t3);margin-top:2px;line-height:1.4">${t.desc}</div>
+    </div>`).join('');
+
+  const equipChips=gymEquipment.map((e,i)=>`
+    <span class="gym-equip-chip">${e}<span class="gym-rm" onclick="removeGymEquip(${i})">✕</span></span>`).join('');
+
+  const gymCard=`<div class="goals-card" style="margin-top:18px">
+    <div class="goals-title">🏋️ Your Gym Setup</div>
+    <div style="font-size:12px;color:var(--t2);margin-bottom:4px">What kind of gym do you have? We'll tailor workout recommendations to your equipment.</div>
+    <div class="gym-type-grid">${gymTypeCards}</div>
+    ${gymType?`<div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Your Equipment</div>
+    <div class="gym-equip-list">${equipChips||'<span style="font-size:11px;color:var(--t3)">No equipment listed yet</span>'}</div>
+    <div class="gym-add-row">
+      <input class="gym-add-inp" id="gym-add-inp" placeholder="Add equipment (e.g. Barbell, Pull-up Bar)" onkeydown="if(event.key==='Enter')addGymEquip()">
+      <button class="btn btn-amber" onclick="addGymEquip()" style="white-space:nowrap">+ Add</button>
+    </div>
+    <button class="btn" onclick="resetGymEquip()" style="width:100%;margin-top:10px;font-size:11px;color:var(--t3)">↺ Reset to template defaults</button>`
+    :'<div style="font-size:12px;color:var(--t3);text-align:center;padding:10px 0">Select a gym type above to get started</div>'}
+  </div>`;
+
   return`<div class="goals-wrap">
     <div style="font-family:'Playfair Display',serif;font-size:22px;margin-bottom:18px">🎯 Goals & Profile</div>
     <div class="goals-cols">${profileForm}${analysisHtml}</div>
+    ${gymCard}
   </div>`;
 }
 
@@ -2983,6 +3161,36 @@ function saveProfile(){
   else p.goal=ST.profileGoal||'lose';
   S.set('profile',p);
   toast('✅','Profile saved! Daily target: '+CalorieEngine.getDailyTarget(p).toLocaleString()+' cal');
+  render();
+}
+
+function selectGymType(type){
+  const t=GYM_TEMPLATES[type];
+  if(!t)return;
+  const existing=S.get('gym',{type:null,equipment:[]});
+  // Only reset equipment if switching type
+  S.set('gym',{type,equipment:existing.type===type?existing.equipment:[...t.equipment]});
+  render();
+}
+function addGymEquip(){
+  const inp=document.getElementById('gym-add-inp');
+  const val=(inp?.value||'').trim();
+  if(!val)return;
+  const gym=S.get('gym',{type:null,equipment:[]});
+  if(!gym.equipment.includes(val)){gym.equipment.push(val);S.set('gym',gym);}
+  if(inp)inp.value='';
+  render();
+}
+function removeGymEquip(idx){
+  const gym=S.get('gym',{type:null,equipment:[]});
+  gym.equipment.splice(idx,1);
+  S.set('gym',gym);
+  render();
+}
+function resetGymEquip(){
+  const gym=S.get('gym',{type:null,equipment:[]});
+  const t=GYM_TEMPLATES[gym.type];
+  if(t){gym.equipment=[...t.equipment];S.set('gym',gym);}
   render();
 }
 
