@@ -210,21 +210,20 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 
 /* ─── VOICE UI ─── */
 #voice-fab{
-  position:fixed;bottom:30px;left:30px;z-index:400;
-  width:56px;height:56px;border-radius:50%;
-  background:var(--surface);border:2px solid var(--border);
+  width:36px;height:36px;border-radius:50%;
+  background:var(--surface);border:1.5px solid var(--border);
   display:flex;align-items:center;justify-content:center;
-  cursor:pointer;transition:all .2s;box-shadow:0 4px 20px rgba(0,0,0,.4);
-  font-size:22px;
+  cursor:pointer;transition:all .2s;flex-shrink:0;
+  font-size:17px;position:relative;
 }
-#voice-fab:hover{border-color:var(--amber);transform:scale(1.05)}
+#voice-fab:hover{border-color:var(--amber);background:var(--adim)}
 #voice-fab.listening{background:var(--gdim);border-color:var(--green);animation:micPulse 1.5s infinite}
-#voice-fab.activated{background:var(--green);border-color:var(--green);box-shadow:0 4px 24px rgba(90,171,110,.5)}
+#voice-fab.activated{background:var(--green);border-color:var(--green);box-shadow:0 2px 12px rgba(90,171,110,.5)}
 #voice-fab.processing{background:var(--adim);border-color:var(--amber);animation:micPulse 0.8s infinite}
 #voice-fab .ripple{position:absolute;width:100%;height:100%;border-radius:50%;border:2px solid var(--green);animation:ripple 1.5s linear infinite;pointer-events:none}
 
 #voice-panel{
-  position:fixed;bottom:100px;left:24px;z-index:400;
+  position:fixed;top:62px;right:16px;z-index:400;
   background:var(--card);border:1px solid var(--bl);
   border-radius:18px;padding:16px 20px;width:300px;
   box-shadow:0 8px 40px rgba(0,0,0,.5);
@@ -596,6 +595,7 @@ body.pwa-mode #app{padding-bottom:calc(62px + env(safe-area-inset-bottom))}
     <div class="logo">
       <div class="logo-icon">🍽️</div>
       <div><div class="logo-title">PlateWeek</div><div class="logo-sub">Meal &amp; Workout Planner</div></div>
+      <div id="voice-fab" onclick="Voice.togglePanel()" title="Tap to use voice commands">🎙</div>
     </div>
     <div class="hdr-right">
       <div class="nav-tabs">
@@ -629,8 +629,7 @@ body.pwa-mode #app{padding-bottom:calc(62px + env(safe-area-inset-bottom))}
     </div>
     <div style="display:flex;align-items:center;gap:9px">
       <div id="meal-time-ind" style="font-size:11px;color:var(--t3)"></div>
-      <button class="btn" style="font-size:10px;padding:5px 10px;border-color:var(--gdim);color:var(--green)" onclick="Voice.togglePanel()">🎙 Voice</button>
-      <button class="btn" onclick="triggerCheckIn(null,true)" style="font-size:10px;padding:5px 10px">🔔 Check-In</button>
+<button class="btn" onclick="triggerCheckIn(null,true)" style="font-size:10px;padding:5px 10px">🔔 Check-In</button>
       <button class="btn" onclick="genGroceryFromWeek()" style="font-size:10px;padding:5px 10px">🛒 Grocery</button>
     </div>
   </div>
@@ -638,8 +637,6 @@ body.pwa-mode #app{padding-bottom:calc(62px + env(safe-area-inset-bottom))}
   <div id="content"></div>
 </div>
 
-<!-- Voice FAB -->
-<div id="voice-fab" onclick="Voice.togglePanel()" title="Tap to use voice commands">🎙</div>
 <div id="voice-panel">
   <div class="vp-status" id="vp-status">Tap the button to speak</div>
   <div class="vp-heard" id="vp-heard">—</div>
