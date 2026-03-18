@@ -688,9 +688,8 @@ body.pwa-mode #app{padding-bottom:calc(62px + env(safe-area-inset-bottom))}
     </div>
     <div class="hdr-right">
       <div class="nav-tabs">
-        <button class="nav-tab" onclick="setView('today')">🌤 Today</button>
+        <button class="nav-tab" onclick="setView('today')">📆 Today</button>
         <button class="nav-tab active" onclick="setView('week')">📅 Week</button>
-        <button class="nav-tab" onclick="setView('day')">📆 Day</button>
         <button class="nav-tab" onclick="setView('fitness')">💪 Fitness</button>
         <button class="nav-tab" onclick="setView('grocery')">🛒 Grocery</button>
         <button class="nav-tab" onclick="setView('history')">📋 Log</button>
@@ -2137,15 +2136,15 @@ function dismissNotif(){document.getElementById('notif-bar').classList.add('hidd
 function render(){
   renderStats();renderWeekLabel();renderMealTimeInd();
   const area=document.getElementById('content');
-  if(ST.view==='today') area.innerHTML=renderTodayView();
+  if(ST.view==='today'||ST.view==='day') area.innerHTML=renderTodayView();
   else if(ST.view==='week') area.innerHTML=renderWeekView();
-  else if(ST.view==='day') area.innerHTML=renderDayView();
   else if(ST.view==='grocery') area.innerHTML=renderGroceryView();
   else if(ST.view==='history') area.innerHTML=renderHistoryView();
   else if(ST.view==='fitness') area.innerHTML=renderFitnessView();
   else if(ST.view==='goals') area.innerHTML=renderGoalsView();
   document.querySelectorAll('.nav-tab').forEach((t,i)=>{
-    t.classList.toggle('active',['today','week','day','fitness','grocery','history','goals'][i]===ST.view);
+    const v=ST.view==='day'?'today':ST.view;
+    t.classList.toggle('active',['today','week','fitness','grocery','history','goals'][i]===v);
   });
 }
 
@@ -2238,66 +2237,6 @@ function renderWeekView(){
     return lbl+cells;
   }).join('');
   return`<div class="wg-wrap"><div class="wg"><div class="wg-corner"></div>${dh}${rows}</div></div>`;
-}
-
-function renderDayView(){
-  const dates=getWeekDates(ST.weekOffset),plan=S.get('plans',{}),hist=S.get('history',[]),wk=S.get('workouts',{});
-  const tabs=dates.map((d,i)=>`<button class="day-tab${i===ST.activeDayIdx?' active':''}${isToday(d)?' today-t':''}" onclick="setActiveDay(${i})">${DAYS_S[i]} ${d.getDate()}${isToday(d)?'·':''}</button>`).join('');
-  const ad=dates[ST.activeDayIdx],key=dk(ad),canLog=isPast(ad)||isToday(ad);
-  const prevD=new Date(ad);prevD.setDate(ad.getDate()-1);
-  const mealCards=MEALS.map((meal,i)=>{
-    const cls=MEAL_CLS[meal],mn=plan[key]?.[meal],he=hist.find(h=>h.date===key&&h.mealType===meal),isEaten=he?.eaten;
-    return`<div class="dv-card${isEaten?' ':''}">
-      <div class="dvc-l"><div class="dvc-icon ${cls}">${MEAL_EMOJI[meal]}</div>
-        <div><div class="dvc-type ${cls}">${meal}</div>
-          <div class="dvc-name${mn?'':' empty'}">${mn||'Not planned'}</div>
-          ${mn?`<span class="meal-time-tag">⏰ ${getMealTime(key,meal)}</span>`:''}
-        </div>
-      </div>
-      <div class="dvc-r">
-        <button class="btn" onclick="openEdit('${key}','${meal}')" style="font-size:10px;padding:5px 10px">✏️</button>
-        ${canLog?`<button class="eat-btn ${isEaten?'on':'off'}" onclick="toggleEaten('${key}','${meal}','${(mn||'').replace(/'/g,"\\'")}')">${isEaten?'✓':'○'}</button>`:''}
-      </div>
-    </div>`;
-  }).join('');
-  const wo=wk[key];
-  const woCard=`<div class="dv-card">
-    <div class="dvc-l"><div class="dvc-icon wo">💪</div>
-      <div><div class="dvc-type wo">Workout</div>
-        ${wo?`<div class="dvc-name">${wo.type}</div><div style="font-size:10px;color:var(--t3);margin-top:2px">${wo.duration||''}${wo.notes?' · '+wo.notes:''}</div>`
-            :`<div class="dvc-name empty">Not planned</div>`}
-      </div>
-    </div>
-    <div class="dvc-r">
-      <button class="btn" onclick="openWoEdit('${key}')" style="font-size:10px;padding:5px 10px">✏️</button>
-      ${wo?`<button class="wo-done-btn ${wo.completed?'on':'off'}" onclick="toggleWoDone('${key}')">${wo.completed?'✓':'○'}</button>`:''}
-    </div>
-  </div>`;
-  const suggSections=MEALS.map(meal=>{
-    const cls=MEAL_CLS[meal],prevMeal=plan[dk(prevD)]?.[meal]||null;
-    const suggs=Pattern.getSuggestions(meal,prevMeal?[prevMeal]:[],4);
-    const chips=suggs.map(s=>`<div class="sp-chip${plan[key]?.[meal]===s.name?' cur':''}" onclick="quickSet('${key}','${meal}','${s.name.replace(/'/g,"\\'")}')">
-      <span class="sp-chip-name">${s.name}</span><span class="sp-chip-freq">${s.count>0?'×'+s.count:'new'}</span></div>`).join('');
-    return`<div class="sp-section"><div class="sp-st ${cls}">${meal}</div>${chips||'<div class="empty-hint">Add meals to build patterns</div>'}</div>`;
-  }).join('');
-  const woSugg=`<div class="sp-section"><div class="sp-st wo">Workout</div>${WO_TYPES.slice(0,4).map(t=>`<div class="sp-chip" onclick="quickSetWo('${key}','${t.label}')"><span class="sp-chip-name">${t.label}</span></div>`).join('')}</div>`;
-  const calWidget=(canLog||isToday(ad))?renderCalorieWidget(key):'';
-  return`<div class="dv-wrap">
-    <div class="day-tabs">${tabs}</div>
-    <div class="dv-cols">
-      <div>
-        <div style="font-family:'Playfair Display',serif;font-size:18px;color:var(--t2);margin-bottom:13px">${DAYS_S[ST.activeDayIdx]}, ${MONTHS[ad.getMonth()]} ${ad.getDate()}</div>
-        <div class="dv-meals">${mealCards}${woCard}</div>
-        ${calWidget}
-      </div>
-      <div>
-        <div class="sp">
-          <div class="sp-hdr"><div><div class="sp-title">✨ Suggestions</div><div style="font-size:10px;color:var(--t3);margin-top:2px">Pattern-based, no back-to-back</div></div><div class="sp-badge">Smart</div></div>
-          ${suggSections}${woSugg}
-        </div>
-      </div>
-    </div>
-  </div>`;
 }
 
 function renderGroceryView(){
@@ -3294,7 +3233,7 @@ function selAllDays(){ST.grocerySelDays=null;render();}
 // ═══════════════════════════════════════════════
 function setView(v){ST.view=v;render();updateBnav(v);}
 function shiftWeek(d){ST.weekOffset+=d;render();}
-function switchToDay(i){ST.activeDayIdx=i;ST.view='day';render();}
+function switchToDay(i){ST.activeDayIdx=i;ST.view='today';render();}
 function setActiveDay(i){ST.activeDayIdx=i;render();}
 
 function toggleEaten(key,mealType,mealName){
@@ -3320,74 +3259,83 @@ function saveMealTime(key,mealType,time){
 //  TODAY VIEW
 // ═══════════════════════════════════════════════
 function renderTodayView(){
-  const today=new Date(),todayK=dk(today),plan=S.get('plans',{}),wk=S.get('workouts',{}),eaten=S.get('eaten_today',{});
+  const dates=getWeekDates(ST.weekOffset),plan=S.get('plans',{}),hist=S.get('history',[]),wk=S.get('workouts',{});
+  const eatenTs=S.get('eaten_today',{});
+  const tabs=dates.map((d,i)=>`<button class="day-tab${i===ST.activeDayIdx?' active':''}${isToday(d)?' today-t':''}" onclick="setActiveDay(${i})">${DAYS_S[i]} ${d.getDate()}${isToday(d)?'·':''}</button>`).join('');
+  const ad=dates[ST.activeDayIdx],key=dk(ad),canLog=isPast(ad)||isToday(ad);
+  const isTodayDay=isToday(ad);
+  const prevD=new Date(ad);prevD.setDate(ad.getDate()-1);
+  // Header — motivational for today, plain date for other days
   const dayNames=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   const motivs=['Start strong — your body needs fuel 🔥','Great days begin with great meals 🌟','You\'ve got this — stay on track 💪','Halfway through — keep the momentum ⚡','Almost there — finish strong 🏁','Rest, refuel, and recharge 🌿','Prep for the week ahead 📅'];
-  const motiv=motivs[today.getDay()];
+  const hdrHtml=isTodayDay
+    ?`<div class="today-hdr" style="margin-bottom:14px"><div class="today-date">${dayNames[ad.getDay()]}, ${MONTHS[ad.getMonth()]} ${ad.getDate()}</div><div class="today-motiv">${motivs[ad.getDay()]}</div></div>`
+    :`<div style="font-family:'Playfair Display',serif;font-size:18px;color:var(--t2);margin-bottom:13px">${DAYS_S[ST.activeDayIdx]}, ${MONTHS[ad.getMonth()]} ${ad.getDate()}</div>`;
+  // Meal cards — timestamps shown for today, plain eaten toggle for past days
   const mealCards=MEALS.map(meal=>{
-    const cls=MEAL_CLS[meal],mn=plan[todayK]?.[meal],isEaten=eaten[todayK]?.[meal];
-    const bgCls={bf:'var(--bfdim)',lu:'var(--ludim)',di:'var(--didim)'}[cls];
-    const txtCls={bf:'var(--bf)',lu:'var(--lu)',di:'var(--di)'}[cls];
-    return`<div class="today-meal-card${isEaten?' eaten-card':''}">
-      <div class="tmc-l">
-        <div class="tmc-icon" style="background:${bgCls}">${MEAL_EMOJI[meal]}</div>
-        <div>
-          <div class="tmc-type" style="color:${txtCls}">${meal}</div>
-          <div class="tmc-name">${mn||'<span style="font-style:italic;color:var(--t3);font-size:13px">Not planned</span>'}</div>
-          <div class="tmc-time">⏰ ${getMealTime(todayK,meal)}</div>
-          ${isEaten?`<span class="meal-logged-stamp">✓ Eaten at ${isEaten}</span>`:''}
+    const cls=MEAL_CLS[meal],mn=plan[key]?.[meal];
+    const he=hist.find(h=>h.date===key&&h.mealType===meal),isEaten=he?.eaten;
+    const ts=isTodayDay?eatenTs[key]?.[meal]:null;
+    const eatFn=isTodayDay?`toggleMealEaten('${key}','${meal}')`:`toggleEaten('${key}','${meal}','${(mn||'').replace(/'/g,"\\'")}')`;
+    return`<div class="dv-card">
+      <div class="dvc-l"><div class="dvc-icon ${cls}">${MEAL_EMOJI[meal]}</div>
+        <div><div class="dvc-type ${cls}">${meal}</div>
+          <div class="dvc-name${mn?'':' empty'}">${mn||'Not planned'}</div>
+          ${mn?`<span class="meal-time-tag">⏰ ${getMealTime(key,meal)}</span>`:''}
+          ${ts?`<span class="meal-logged-stamp">✓ Eaten at ${ts}</span>`:''}
         </div>
       </div>
-      <div class="tmc-r">
-        <button class="btn" onclick="openEdit('${todayK}','${meal}')" style="font-size:10px;padding:5px 10px">✏️</button>
-        <button class="eat-btn ${isEaten?'on':'off'}" onclick="toggleMealEaten('${todayK}','${meal}')">${isEaten?'✓':'○'}</button>
+      <div class="dvc-r">
+        <button class="btn" onclick="openEdit('${key}','${meal}')" style="font-size:10px;padding:5px 10px">✏️</button>
+        ${canLog?`<button class="eat-btn ${isEaten?'on':'off'}" onclick="${eatFn}">${isEaten?'✓':'○'}</button>`:''}
       </div>
     </div>`;
   }).join('');
-  const wo=wk[todayK];
-  const woCard=`<div class="today-wo-card">
-    <div class="tmc-l">
-      <div class="tmc-icon" style="background:var(--pdim)">💪</div>
-      <div>
-        <div class="tmc-type" style="color:var(--purple)">Workout</div>
-        <div class="tmc-name">${wo?wo.type:'<span style="font-style:italic;color:var(--t3);font-size:13px">Not planned</span>'}</div>
-        ${wo&&wo.duration?`<div class="tmc-time">${wo.duration}${wo.notes?' · '+wo.notes:''}</div>`:''}
+  // Workout card
+  const wo=wk[key];
+  const woCard=`<div class="dv-card">
+    <div class="dvc-l"><div class="dvc-icon wo">💪</div>
+      <div><div class="dvc-type wo">Workout</div>
+        ${wo?`<div class="dvc-name">${wo.type}</div><div style="font-size:10px;color:var(--t3);margin-top:2px">${wo.duration||''}${wo.notes?' · '+wo.notes:''}</div>`
+            :`<div class="dvc-name empty">Not planned</div>`}
       </div>
     </div>
-    <div class="tmc-r">
-      <button class="btn" onclick="openWoEdit('${todayK}')" style="font-size:10px;padding:5px 10px">✏️</button>
-      ${wo?`<button class="wo-done-btn ${wo.completed?'on':'off'}" onclick="toggleWoDone('${todayK}')">${wo.completed?'✓':'○'}</button>`:''}
+    <div class="dvc-r">
+      <button class="btn" onclick="openWoEdit('${key}')" style="font-size:10px;padding:5px 10px">✏️</button>
+      ${wo?`<button class="wo-done-btn ${wo.completed?'on':'off'}" onclick="toggleWoDone('${key}')">${wo.completed?'✓':'○'}</button>`:''}
     </div>
   </div>`;
-  const grItems=S.get('grocery_items',[]).filter(i=>!i.checked);
-  const grRows=grItems.slice(0,8).map((item,i)=>{
-    const realIdx=S.get('grocery_items',[]).indexOf(item);
-    return`<div class="today-gq-item" onclick="quickCheckGrocery(${realIdx},true);render()">
-      <div style="width:18px;height:18px;border-radius:4px;border:1.5px solid var(--bl);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0"></div>
-      <span>${item.name}</span>
-    </div>`;
+  // Calorie widget
+  const calWidget=canLog?renderCalorieWidget(key):'';
+  // Water tracker + Day summary — today only
+  const waterHtml=isTodayDay?`<div style="margin-top:14px"><div class="today-sec-title">💧 Hydration</div>${renderWaterSection(key)}</div>`:'';
+  const summaryHtml=isTodayDay?`<div style="margin-top:14px"><div class="today-sec-title">Day Summary</div>${renderDailySummary(key)}</div>`:'';
+  // Suggestions sidebar
+  const suggSections=MEALS.map(meal=>{
+    const cls=MEAL_CLS[meal],prevMeal=plan[dk(prevD)]?.[meal]||null;
+    const suggs=Pattern.getSuggestions(meal,prevMeal?[prevMeal]:[],4);
+    const chips=suggs.map(s=>`<div class="sp-chip${plan[key]?.[meal]===s.name?' cur':''}" onclick="quickSet('${key}','${meal}','${s.name.replace(/'/g,"\\'")}')">
+      <span class="sp-chip-name">${s.name}</span><span class="sp-chip-freq">${s.count>0?'×'+s.count:'new'}</span></div>`).join('');
+    return`<div class="sp-section"><div class="sp-st ${cls}">${meal}</div>${chips||'<div class="empty-hint">Add meals to build patterns</div>'}</div>`;
   }).join('');
-  return`<div class="today-wrap">
-    <div class="today-hdr">
-      <div class="today-date">${dayNames[today.getDay()]}, ${MONTHS[today.getMonth()]} ${today.getDate()}</div>
-      <div class="today-motiv">${motiv}</div>
-    </div>
-    <div class="today-sec-title">Meals Today</div>
-    ${mealCards}
-    <div class="today-sec-title">Workout</div>
-    ${woCard}
-    <div class="today-sec-title">💧 Hydration</div>
-    ${renderWaterSection(todayK)}
-    <div class="today-sec-title">Grocery Quick-View</div>
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 18px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-        <span style="font-size:13px">${grItems.length} items remaining</span>
-        <button class="btn" onclick="setView('grocery')" style="font-size:11px">View All →</button>
+  const woSugg=`<div class="sp-section"><div class="sp-st wo">Workout</div>${WO_TYPES.slice(0,4).map(t=>`<div class="sp-chip" onclick="quickSetWo('${key}','${t.label}')"><span class="sp-chip-name">${t.label}</span></div>`).join('')}</div>`;
+  return`<div class="dv-wrap">
+    <div class="day-tabs">${tabs}</div>
+    <div class="dv-cols">
+      <div>
+        ${hdrHtml}
+        <div class="dv-meals">${mealCards}${woCard}</div>
+        ${calWidget}
+        ${waterHtml}
+        ${summaryHtml}
       </div>
-      ${grRows||'<div style="font-size:12px;color:var(--t3);text-align:center;padding:10px 0">All done! 🎉</div>'}
+      <div>
+        <div class="sp">
+          <div class="sp-hdr"><div><div class="sp-title">✨ Suggestions</div><div style="font-size:10px;color:var(--t3);margin-top:2px">Pattern-based, no back-to-back</div></div><div class="sp-badge">Smart</div></div>
+          ${suggSections}${woSugg}
+        </div>
+      </div>
     </div>
-    <div class="today-sec-title">Day Summary</div>
-    ${renderDailySummary(todayK)}
   </div>`;
 }
 function fmtTime(d){
@@ -3396,9 +3344,17 @@ function fmtTime(d){
 }
 function toggleMealEaten(key,meal){
   const e=S.get('eaten_today',{});if(!e[key])e[key]={};
-  // schema: string timestamp = eaten, null/absent = not eaten
-  if(e[key][meal]){e[key][meal]=null;}else{e[key][meal]=fmtTime(new Date());}
-  S.set('eaten_today',e);render();
+  const wasEaten=!!e[key][meal];
+  e[key][meal]=wasEaten?null:fmtTime(new Date());
+  S.set('eaten_today',e);
+  // keep history in sync so the Log view stays accurate
+  const mealName=S.get('plans',{})[key]?.[meal]||'';
+  const hist=S.get('history',[]);
+  const idx=hist.findIndex(h=>h.date===key&&h.mealType===meal);
+  if(idx>=0)hist[idx].eaten=!wasEaten;
+  else if(!wasEaten&&mealName)hist.push({date:key,mealType:meal,mealName,eaten:true});
+  S.set('history',hist);
+  render();
 }
 function getWaterGoal(){
   const p=CalorieEngine.getProfile();
