@@ -2136,15 +2136,14 @@ function dismissNotif(){document.getElementById('notif-bar').classList.add('hidd
 function render(){
   renderStats();renderWeekLabel();renderMealTimeInd();
   const area=document.getElementById('content');
-  if(ST.view==='today'||ST.view==='day') area.innerHTML=renderTodayView();
+  if(ST.view==='today') area.innerHTML=renderTodayView();
   else if(ST.view==='week') area.innerHTML=renderWeekView();
   else if(ST.view==='grocery') area.innerHTML=renderGroceryView();
   else if(ST.view==='history') area.innerHTML=renderHistoryView();
   else if(ST.view==='fitness') area.innerHTML=renderFitnessView();
   else if(ST.view==='goals') area.innerHTML=renderGoalsView();
   document.querySelectorAll('.nav-tab').forEach((t,i)=>{
-    const v=ST.view==='day'?'today':ST.view;
-    t.classList.toggle('active',['today','week','fitness','grocery','history','goals'][i]===v);
+    t.classList.toggle('active',['today','week','fitness','grocery','history','goals'][i]===ST.view);
   });
 }
 
@@ -3949,8 +3948,8 @@ function logFoodVoice(food,calories,dateKey){
   if(!log[dateKey])log[dateKey]=[];
   log[dateKey].push({id:Date.now(),food,calories,voice:true});
   S.set('food_log',log);
-  toast('🍽️',`Logged: ${food}${calories?` (${calories} cal)`:' — tap Day view to edit calories'}`);
-  if(ST.view==='day')render();
+  toast('🍽️',`Logged: ${food}${calories?` (${calories} cal)`:' — tap Today to edit calories'}`);
+  if(ST.view==='today')render();
 }
 
 function delFoodLog(dateKey,id){
